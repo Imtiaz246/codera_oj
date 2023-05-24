@@ -33,11 +33,11 @@ type mail struct {
 }
 
 func NewMailer() Mailer {
-	config := config.GetEmailConfig()
+	emailConfig := config.GetEmailConfig()
 	return &mail{
 		senderName: emailSourceName,
-		senderAddr: config.SenderAddr,
-		senderPass: config.SenderPass,
+		senderAddr: emailConfig.SenderAddr,
+		senderPass: emailConfig.SenderPass,
 		error:      nil,
 	}
 }
@@ -80,11 +80,11 @@ func (m *mail) WithTemplate(templateType string, data interface{}) *mail {
 	switch templateType {
 	case EmailTypeEmailVerification:
 		template, err := createEmailVerifyTemplate(data)
-		m.email.HTML = template
 		if err != nil {
 			m.error = err
 			goto END
 		}
+		m.email.HTML = template
 	}
 END:
 	return m

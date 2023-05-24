@@ -1,7 +1,7 @@
 package store
 
 import (
-	models2 "github.com/imtiaz246/codera_oj/app/models"
+	"github.com/imtiaz246/codera_oj/app/models"
 	"gorm.io/gorm"
 )
 
@@ -15,12 +15,14 @@ func NewVerifyEmailStore(db *gorm.DB) *VerifyEmailStore {
 	}
 }
 
-func (vs *VerifyEmailStore) Create(ve *models2.VerifyEmail, u *models2.User) error {
-	ve.User = *u
-	ve.GenerateToken()
+func (vs *VerifyEmailStore) Create(ve *models.VerifyEmail) error {
 	return vs.db.Create(ve).Error
 }
 
-func (vs *VerifyEmailStore) GetIDToken(id, token string, ve *models2.VerifyEmail) error {
+func (vs *VerifyEmailStore) GetIDToken(id, token string, ve *models.VerifyEmail) error {
 	return vs.db.Preload("User").Where("id = ? AND token = ?", id, token).First(ve).Error
+}
+
+func (vs *VerifyEmailStore) Update(ve *models.VerifyEmail) error {
+	return vs.db.Save(ve).Error
 }

@@ -23,23 +23,23 @@ type templateData struct {
 	ExpirationTime string
 }
 
-func initTemplateData(reqData interface{}) templateData {
-	ve := reqData.(*models.VerifyEmail)
-	data := new(templateData)
-	data.Username = ve.User.Username
-	data.Link = ve.GenerateLink()
-	data.ExpirationTime = ve.ExpirationTime.Format("2006-01-02 03:04:05 pm")
-	return *data
+func initTemplateData(data interface{}) *templateData {
+	ve := data.(*models.VerifyEmail)
+	d := new(templateData)
+	d.Username = ve.User.Username
+	d.Link = ve.GenerateLink()
+	d.ExpirationTime = ve.ExpirationTime.Format("2006-01-02 03:04:05 pm")
+	return d
 }
 
 func createEmailVerifyTemplate(reqData interface{}) ([]byte, error) {
-	data := initTemplateData(reqData)
+	d := initTemplateData(reqData)
 	t, err := template.New("verify-email").Parse(htmlTemplate)
 	if err != nil {
 		return nil, err
 	}
 	var output bytes.Buffer
-	if err := t.Execute(&output, data); err != nil {
+	if err := t.Execute(&output, d); err != nil {
 		return nil, err
 	}
 	return output.Bytes(), nil

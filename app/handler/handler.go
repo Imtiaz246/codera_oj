@@ -8,7 +8,6 @@ import (
 
 type Handler struct {
 	*store.Store
-	validator *Validator
 }
 
 type Validator struct {
@@ -20,10 +19,8 @@ func NewHandler() (*Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	validator := NewValidator()
 	return &Handler{
 		store,
-		validator,
 	}, nil
 }
 

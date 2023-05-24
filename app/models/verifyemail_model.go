@@ -49,3 +49,23 @@ func (ve *VerifyEmail) GenerateLink() string {
 func (ve *VerifyEmail) ExtractEmail() string {
 	return ve.Email
 }
+
+func (ve *VerifyEmail) VerifiedUser() *User {
+	u := &ve.User
+	u.Email = ve.Email
+	u.Verified = true
+	return u
+}
+
+func (ve *VerifyEmail) SetExpirationTime() {
+	ve.ExpirationTime = time.Now().Add(time.Minute * 15)
+}
+
+func (ve *VerifyEmail) FillEmailVerifierInfo(u *User) error {
+	ve.User = *u
+	ve.SetExpirationTime()
+	if err := ve.GenerateToken(); err != nil {
+		return err
+	}
+	return nil
+}

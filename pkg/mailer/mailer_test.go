@@ -2,14 +2,16 @@ package mailer
 
 import (
 	models2 "github.com/imtiaz246/codera_oj/app/models"
-	"github.com/imtiaz246/codera_oj/initializers/config"
+	"github.com/imtiaz246/codera_oj/initializers"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
 )
 
 func init() {
-	config.LoadConfigs()
+	if err := initializers.Initialize(); err != nil {
+		panic("initialization failed")
+	}
 }
 func TestMailer(t *testing.T) {
 	user := models2.User{
@@ -22,9 +24,10 @@ func TestMailer(t *testing.T) {
 		User:           user,
 		ExpirationTime: time.Now().Add(time.Minute * 10),
 	}
-	evm.GenerateToken()
+	err := evm.GenerateToken()
+	require.Equal(t, err, nil)
 
-	err := NewMailer().
+	err = NewMailer().
 		To([]string{user.ExtractEmail()}).
 		WithTemplate(EmailTypeEmailVerification, &evm).
 		WithSubject("verify email").

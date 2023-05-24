@@ -1,38 +1,39 @@
 package handler
 
 import (
+	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v4"
-	"github.com/imtiaz246/codera_oj/app/models"
-	"github.com/imtiaz246/codera_oj/initializers/config"
-	"time"
 )
 
-func ExtractRequestedUserFromClaims(c *fiber.Ctx) *requestedUser {
-	user := c.Locals("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	username := claims["username"].(string)
-	email := claims["email"].(string)
-	return &requestedUser{
-		Username: username,
-		Email:    email,
-	}
+var v *validator.Validate
+
+func init() {
+	v = validator.New()
 }
 
-func GenerateEncodedToken(u *models.User) (string, error) {
-	claims := jwt.MapClaims{
-		"email":        u.Email,
-		"username":     u.Username,
-		"organization": u.Organization,
-		"firstName":    u.FirstName,
-		"lastName":     u.LastName,
-		"country":      u.Country,
-		"exp":          time.Now().Add(time.Hour * 24 * 30).Unix(),
+// validate validates a user defined structs
+func validate(s interface{}) error {
+	if err := v.Struct(s); err != nil {
+		var errMsg string
+		for _, e := range err.(validator.ValidationErrors) {
+			errMsg += fmt.Sprintf("%s field validation failed on tag '%s', actual value is '%s'\n",
+				e.Field(), e.Tag(), e.Value())
+		}
+		return fmt.Errorf(errMsg)
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	encodedToken, err := token.SignedString(config.GetAuthConfig().JWTSecret)
-	if err != nil {
-		return "", err
+
+	return nil
+}
+
+// BindAndValidate binds request payload and validates the
+// requested payload.
+func BindAndValidate(ctx *fiber.Ctx, d any) error {
+	if err := ctx.BodyParser(d); err != nil {
+		return err
 	}
-	return encodedToken, nil
+	if err := validate(d); err != nil {
+		return err
+	}
+	return nil
 }

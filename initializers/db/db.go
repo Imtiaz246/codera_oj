@@ -15,7 +15,7 @@ var (
 func InitializeDB() error {
 	dbConfig := config.GetDBConfig()
 	var err error
-	switch dbConfig.DB_TYPE {
+	switch dbConfig.DbType {
 	case "sqlite3":
 		db, err = connSqliteDB()
 		if err != nil {

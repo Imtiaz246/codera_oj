@@ -36,7 +36,7 @@ func NewMailer() Mailer {
 	emailConfig := config.GetEmailConfig()
 	return &mail{
 		senderName: emailSourceName,
-		senderAddr: emailConfig.SenderAddr,
+		senderAddr: emailConfig.SenderEmail,
 		senderPass: emailConfig.SenderPass,
 		error:      nil,
 	}

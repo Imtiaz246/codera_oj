@@ -1,0 +1,32 @@
+app:
+  APP_NAME: codera_oj
+  RUN_MODE: dev
+
+server:
+  PROTOCOL: http
+  DOMAIN: localhost
+  PORT: 3000
+
+database:
+  #  Either "postgres" or "sqlite3"
+  DB_TYPE: sqlite3
+  HOST: 127.0.0.1:3306
+  NAME: codera_oj
+  USER: root
+  PASSWORD: "1234"
+  SSL_MODE: disable
+  CHARSET: utf8
+  PATH: gorm.sqlite
+  SQLITE_TIMEOUT: 500
+  ITERATE_BUFFER_SIZE: 50
+  LOG_SQL: true
+  DB_RETRIES: 10
+  DB_RETRY_BACKOFF: 3s
+
+email:
+  SENDER_EMAIL:
+  SENDER_PASSWORD:
+
+auth:
+  PUBLIC_KEY:
+  PRIVATE_KEY:

@@ -1,100 +1,78 @@
 package config
 
 import (
-	"github.com/go-ini/ini"
-	"log"
-	"os"
+	_ "embed"
+	"errors"
+	"gopkg.in/yaml.v3"
 )
-
-type Config struct {
-	server   serverConfig
-	database databaseConfig
-	auth     authConfig
-	email    emailConfig
-}
 
 var (
-	GlobalCfg Config
+	//go:embed app.yaml
+	AppConfigFile []byte
+
+	// GlobalCfg contains the configuration data
+	// of the whole app.
+	GlobalCfg config
 )
 
-type databaseConfig struct {
-	DB_TYPE  string
-	NAME     string
-	HOST     string
-	PATH     string
-	USERNAME string
-	PASSWORD string
+type config struct {
+	App      AppConfig      `yaml:"app"`
+	Server   ServerConfig   `yaml:"server"`
+	Database DatabaseConfig `yaml:"database"`
+	Auth     AuthConfig     `yaml:"auth"`
+	Email    EmailConfig    `yaml:"email"`
 }
 
-type serverConfig struct {
-	PROTOCOL string
-	DOMAIN   string
-	PORT     string
+type AppConfig struct {
+	AppName string `yaml:"APP_NAME"`
+	RunMode string `yaml:"RUN_MODE"`
 }
 
-type authConfig struct {
-	JWTSecret []byte
+type DatabaseConfig struct {
+	DbType   string `yaml:"DB_TYPE"`
+	Name     string `yaml:"NAME"`
+	Host     string `yaml:"HOST"`
+	Path     string `yaml:"PATH"`
+	Username string `yaml:"USERNAME"`
+	Password string `yaml:"PASSWORD"`
 }
 
-type emailConfig struct {
-	SenderAddr string
-	SenderPass string
+type ServerConfig struct {
+	Protocol string `yaml:"PROTOCOL"`
+	Domain   string `yaml:"DOMAIN"`
+	Port     string `yaml:"PORT"`
+}
+
+type AuthConfig struct {
+	PublicKey  string `yaml:"PUBLIC_KEY"`
+	PrivateKey string `yaml:"PRIVATE_KEY"`
+}
+
+type EmailConfig struct {
+	SenderEmail string `yaml:"SENDER_EMAIL"`
+	SenderPass  string `yaml:"SENDER_PASSWORD"`
 }
 
 func LoadConfigs() error {
-	GlobalCfg = Config{
-		server: serverConfig{
-			PROTOCOL: "http",
-			DOMAIN:   "localhost",
-			PORT:     "3000",
-		},
-		database: databaseConfig{
-			DB_TYPE: "sqlite3",
-			PATH:    "gorm.sqlite",
-		},
-		auth: authConfig{
-			JWTSecret: []byte("MY_TEST_JWT_SECRET"),
-		},
-		email: emailConfig{
-			SenderAddr: "imtiazuddincho001@gmail.com",
-			SenderPass: "jlwtvuagzwztpdez",
-		},
+	// Load the app.yaml file content to GlobalCfg variable
+	if err := yaml.Unmarshal(AppConfigFile, &GlobalCfg); err != nil {
+		return errors.New("load configs failed")
 	}
-
-	return nil
-	// todo: resolve panic, use viper instead
-	workingDir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	configDir := workingDir + "/config/app.ini"
-	cfg, err := ini.Load(configDir)
-	if err != nil {
-		return err
-	}
-
-	err = cfg.MapTo(&GlobalCfg)
-	if err != nil {
-		return err
-	}
-
-	log.Println(GlobalCfg)
-
 	return nil
 }
 
-func GetDBConfig() *databaseConfig {
-	return &GlobalCfg.database
+func GetDBConfig() *DatabaseConfig {
+	return &GlobalCfg.Database
 }
 
-func GetAuthConfig() *authConfig {
-	return &GlobalCfg.auth
+func GetAuthConfig() *AuthConfig {
+	return &GlobalCfg.Auth
 }
 
-func GetEmailConfig() *emailConfig {
-	return &GlobalCfg.email
+func GetEmailConfig() *EmailConfig {
+	return &GlobalCfg.Email
 }
 
-func GetServerConfig() *serverConfig {
-	return &GlobalCfg.server
+func GetServerConfig() *ServerConfig {
+	return &GlobalCfg.Server
 }

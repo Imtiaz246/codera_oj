@@ -1,0 +1,6 @@
+tmp
+.idea
+practise.go
+gorm.sqlite
+initializers/config/app.ini
+initializers/config/app.yaml

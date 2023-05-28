@@ -24,14 +24,6 @@ type Mailer interface {
 	WithAttachments([]string) *mail
 }
 
-type mail struct {
-	senderName string
-	senderAddr string
-	senderPass string
-	error      error
-	email      email.Email
-}
-
 func NewMailer() Mailer {
 	emailConfig := config.GetEmailConfig()
 	return &mail{
@@ -40,6 +32,14 @@ func NewMailer() Mailer {
 		senderPass: emailConfig.SenderPass,
 		error:      nil,
 	}
+}
+
+type mail struct {
+	senderName string
+	senderAddr string
+	senderPass string
+	error      error
+	email      email.Email
 }
 
 func (m *mail) Send() error {

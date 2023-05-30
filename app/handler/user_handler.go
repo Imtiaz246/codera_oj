@@ -9,6 +9,15 @@ import (
 )
 
 // GetUserByUsername returns a user information associated with id
+// HealthCheck godoc
+// @Summary Get a user using username.
+// @Description returns a user info using username.
+// @Tags user
+// @Param username path string true "username"
+// @Accept */*
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /users/{username} [get]
 func (h *Handler) GetUserByUsername(c *fiber.Ctx) error {
 	u := new(models.User)
 	if err := h.UserStore.GetUserByUsername(c.Params("username"), u); err != nil {

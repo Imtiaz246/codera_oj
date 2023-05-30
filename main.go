@@ -5,6 +5,7 @@ package main
 
 import (
 	"github.com/imtiaz246/codera_oj/cmd"
+	_ "github.com/imtiaz246/codera_oj/docs"
 	"github.com/imtiaz246/codera_oj/initializers"
 )
 
@@ -16,7 +17,7 @@ func init() {
 }
 
 // @title Fiber Example API
-// @version 1.0
+// @version 2.0
 // @description This is a sample swagger for Fiber
 // @termsOfService http://swagger.io/terms/
 // @contact.name API Support
@@ -24,7 +25,7 @@ func init() {
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost:3000
-// @BasePath /
+// @BasePath /api/v1
 func main() {
 	cmd.Execute()
 }

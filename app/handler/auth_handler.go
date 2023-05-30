@@ -6,14 +6,23 @@ import (
 	apisv1 "github.com/imtiaz246/codera_oj/app/apis/v1"
 	"github.com/imtiaz246/codera_oj/app/models"
 	"github.com/imtiaz246/codera_oj/initializers/config"
-	"github.com/imtiaz246/codera_oj/pkg/mailer"
-	"github.com/imtiaz246/codera_oj/pkg/token"
+	"github.com/imtiaz246/codera_oj/services/mailer"
+	"github.com/imtiaz246/codera_oj/services/token"
 	"github.com/imtiaz246/codera_oj/utils"
 	"net/http"
 	"time"
 )
 
-// SignUp sign up a user
+// SignUp signs up a user
+// HealthCheck godoc
+// @Summary SignUp a user.
+// @Description create account for a user.
+// @Tags auth
+// @Param data body apisv1.UserRegisterRequest true "data"
+// @Accept */*
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /auth/signup [post]
 func (h *Handler) SignUp(ctx *fiber.Ctx) error {
 	req := new(apisv1.UserRegisterRequest)
 	if err := BindAndValidate(ctx, req); err != nil {
@@ -44,6 +53,15 @@ func (h *Handler) SignUp(ctx *fiber.Ctx) error {
 }
 
 // Login create access token and refresh token for a valid user
+// HealthCheck godoc
+// @Summary Login a user.
+// @Description logs in a user if valid credentials given.
+// @Tags auth
+// @Param data body apisv1.UserLoginRequest true "data"
+// @Accept */*
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /auth/login [post]
 func (h *Handler) Login(ctx *fiber.Ctx) error {
 	req := new(apisv1.UserLoginRequest)
 	if err := BindAndValidate(ctx, req); err != nil {
@@ -68,6 +86,16 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 }
 
 // VerifyEmail verifies email of a valid user
+// HealthCheck godoc
+// @Summary Verify email address.
+// @Description Verify email address.
+// @Tags auth
+// @Param id path string true "token ID"
+// @Param token path string true "token"
+// @Accept */*
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /auth/verify-email/{id}/{token} [get]
 func (h *Handler) VerifyEmail(c *fiber.Ctx) error {
 	ve := new(models.VerifyEmail)
 

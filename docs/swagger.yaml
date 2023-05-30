@@ -1,4 +1,30 @@
-basePath: /
+basePath: /api/v1
+definitions:
+  v1.UserLoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    type: object
+  v1.UserRegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
 host: localhost:3000
 info:
   contact:
@@ -10,6 +36,101 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
   title: Fiber Example API
-  version: "1.0"
-paths: {}
+  version: "2.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - '*/*'
+      description: logs in a user if valid credentials given.
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UserLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login a user.
+      tags:
+      - auth
+  /auth/signup:
+    post:
+      consumes:
+      - '*/*'
+      description: create account for a user.
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UserRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: SignUp a user.
+      tags:
+      - auth
+  /auth/verify-email/{id}/{token}:
+    get:
+      consumes:
+      - '*/*'
+      description: Verify email address.
+      parameters:
+      - description: token ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: token
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Verify email address.
+      tags:
+      - auth
+  /users/{username}:
+    get:
+      consumes:
+      - '*/*'
+      description: returns a user info using username.
+      parameters:
+      - description: username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a user using username.
+      tags:
+      - user
 swagger: "2.0"

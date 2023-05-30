@@ -10,9 +10,8 @@ import (
 
 // GetUserByUsername returns a user information associated with id
 func (h *Handler) GetUserByUsername(c *fiber.Ctx) error {
-	username := c.Params("username")
 	u := new(models.User)
-	if err := h.UserStore.GetUserByUsername(username, u); err != nil {
+	if err := h.UserStore.GetUserByUsername(c.Params("username"), u); err != nil {
 		return c.Status(http.StatusNotAcceptable).JSON(utils.NewError(err))
 	}
 

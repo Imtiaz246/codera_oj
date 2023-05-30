@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	gmailSMTPAuth              = "smtp.gmail.com"
-	gmailSMTPServer            = "smtp.gmail.com:587"
-	emailSourceName            = "codera OJ"
+	GmailSMTPAuth              = "smtp.gmail.com"
+	GmailSMTPServer            = "smtp.gmail.com:587"
+	EmailSourceName            = "codera OJ"
 	EmailTypeContestReminder   = "ContestReminder"
 	EmailTypeEmailVerification = "EmailVerification"
 )
@@ -27,7 +27,7 @@ type Mailer interface {
 func NewMailer() Mailer {
 	emailConfig := config.GetEmailConfig()
 	return &mail{
-		senderName: emailSourceName,
+		senderName: EmailSourceName,
 		senderAddr: emailConfig.SenderEmail,
 		senderPass: emailConfig.SenderPass,
 		error:      nil,
@@ -46,9 +46,10 @@ func (m *mail) Send() error {
 	if m.error != nil {
 		return m.error
 	}
+	smtpAuth := smtp.PlainAuth("", m.senderAddr, m.senderPass, GmailSMTPAuth)
 	m.email.From = fmt.Sprintf("%s <%s>", m.senderName, m.senderAddr)
-	smtpAuth := smtp.PlainAuth("", m.senderAddr, m.senderPass, gmailSMTPAuth)
-	return m.email.Send(gmailSMTPServer, smtpAuth)
+
+	return m.email.Send(GmailSMTPServer, smtpAuth)
 }
 
 func (m *mail) To(es []string) *mail {
@@ -59,12 +60,14 @@ func (m *mail) To(es []string) *mail {
 func (m *mail) WithCC(us []*models.User) *mail {
 	cc := extractEmailAddr(us)
 	m.email.Cc = cc
+
 	return m
 }
 
 func (m *mail) WithBCC(us []*models.User) *mail {
 	bcc := extractEmailAddr(us)
 	m.email.Bcc = bcc
+
 	return m
 }
 
@@ -77,6 +80,7 @@ func (m *mail) WithTemplate(templateType string, data interface{}) *mail {
 	if m.error != nil {
 		return m
 	}
+
 	switch templateType {
 	case EmailTypeEmailVerification:
 		template, err := createEmailVerifyTemplate(data)
@@ -86,6 +90,7 @@ func (m *mail) WithTemplate(templateType string, data interface{}) *mail {
 		}
 		m.email.HTML = template
 	}
+
 END:
 	return m
 }
@@ -101,6 +106,7 @@ func (m *mail) WithAttachments(files []string) *mail {
 			goto END
 		}
 	}
+
 END:
 	return m
 }

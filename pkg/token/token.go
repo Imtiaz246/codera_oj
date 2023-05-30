@@ -12,7 +12,12 @@ const (
 	ErrExpiredToken = "token is expired"
 )
 
-type Token interface {
-	CreateToken(username string, duration time.Duration) (string, error)
+type TokenManager interface {
+	CreateToken(username string, duration time.Duration) (*TokenInfo, error)
 	VerifyToken(token string) (*Payload, error)
+}
+
+type TokenInfo struct {
+	Token   string
+	Payload *Payload
 }

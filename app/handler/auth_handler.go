@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/base64"
 	"github.com/gofiber/fiber/v2"
-	apisv1 "github.com/imtiaz246/codera_oj/app/apis/v1"
+	apisv1 "github.com/imtiaz246/codera_oj/app/api/v1"
 	"github.com/imtiaz246/codera_oj/app/models"
 	"github.com/imtiaz246/codera_oj/initializers/config"
 	"github.com/imtiaz246/codera_oj/services/mailer"

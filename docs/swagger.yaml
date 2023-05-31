@@ -25,6 +25,33 @@ definitions:
     - password
     - username
     type: object
+  v1.UserUpdatePasswordRequest:
+    properties:
+      new_password:
+        minLength: 6
+        type: string
+      old_password:
+        minLength: 6
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  v1.UserUpdateRequest:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      first_name:
+        type: string
+      image:
+        type: string
+      last_name:
+        type: string
+      organization:
+        type: string
+    type: object
 host: localhost:3000
 info:
   contact:
@@ -131,6 +158,61 @@ paths:
             additionalProperties: true
             type: object
       summary: Get a user using username.
+      tags:
+      - user
+    put:
+      consumes:
+      - '*/*'
+      description: Update user info
+      parameters:
+      - description: username
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UserUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a user
+      tags:
+      - user
+  /users/{username}/password:
+    put:
+      consumes:
+      - '*/*'
+      description: updates user info
+      parameters:
+      - description: username
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UserUpdatePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update user password
       tags:
       - user
 swagger: "2.0"

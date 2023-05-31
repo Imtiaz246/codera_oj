@@ -40,11 +40,6 @@ type UserLoginResponse struct {
 	RefreshTokenExpiresAt time.Time     `json:"RefreshTokenExpiresAt"`
 }
 
-type UpdatePasswordRequest struct {
-	OldPassword string `json:"old_password" validate:"required,min=6"`
-	NewPassword string `json:"new_password" validate:"required,min=6"`
-}
-
 type RequestedUser struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`

@@ -4,7 +4,9 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"github.com/imtiaz246/codera_oj/initializers/config"
 	"gorm.io/gorm"
+	"strconv"
 	"time"
 )
 
@@ -40,9 +42,8 @@ func (ve *VerifyEmail) IsLinkUsed() bool {
 }
 
 func (ve *VerifyEmail) GenerateLink() string {
-	//serverConfig := config.GetServerConfig()
-	//return serverConfig.Protocol + "://" + serverConfig. + ":" + serverConfig.Port + "/api/v1/auth/verify-email/" + strconv.FormatUint(uint64(ve.ID), 10) + "/" + ve.Token
-	return ""
+	serverConfig := config.GetServerConfig()
+	return serverConfig.Protocol + "://" + serverConfig.Url + "/api/v1/auth/verify-email/" + strconv.FormatUint(uint64(ve.ID), 10) + "/" + ve.Token
 }
 
 func (ve *VerifyEmail) ExtractEmail() string {
@@ -53,6 +54,7 @@ func (ve *VerifyEmail) VerifiedUser() *User {
 	u := &ve.User
 	u.Email = ve.Email
 	u.Verified = true
+
 	return u
 }
 
@@ -66,5 +68,6 @@ func (ve *VerifyEmail) FillEmailVerifierInfo(u *User) error {
 	if err := ve.GenerateToken(); err != nil {
 		return err
 	}
+
 	return nil
 }

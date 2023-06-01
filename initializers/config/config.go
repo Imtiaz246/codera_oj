@@ -2,9 +2,13 @@ package config
 
 import (
 	_ "embed"
-	"errors"
+	"fmt"
 	"gopkg.in/yaml.v3"
 )
+
+// ErrLoadConfigFailed indicates the error for the failure
+// of loading configuration files
+const ErrLoadConfigFailed = "load config failed: %v"
 
 var (
 	//go:embed app.yaml
@@ -14,6 +18,15 @@ var (
 	// of the whole app.
 	GlobalCfg config
 )
+
+// LoadConfigs loads the app config
+func LoadConfigs() error {
+	// Load the app.yaml file content to GlobalCfg variable
+	if err := yaml.Unmarshal(AppConfigFile, &GlobalCfg); err != nil {
+		return fmt.Errorf(ErrLoadConfigFailed, err)
+	}
+	return nil
+}
 
 type config struct {
 	App      AppConfig      `yaml:"app"`
@@ -39,26 +52,18 @@ type DatabaseConfig struct {
 
 type ServerConfig struct {
 	Protocol string `yaml:"PROTOCOL"`
-	Domain   string `yaml:"DOMAIN"`
-	Port     string `yaml:"PORT"`
+	Url      string `yaml:"URL"`
 }
 
 type AuthConfig struct {
-	PublicKey  string `yaml:"PUBLIC_KEY"`
-	PrivateKey string `yaml:"PRIVATE_KEY"`
+	Key                  string `yaml:"PASETO_SYMMETRIC_KEY"`
+	AccessTokenDuration  string `yaml:"ACCESS_TOKEN_DURATION"`
+	RefreshTokenDuration string `yaml:"REFRESH_TOKEN_DURATION"`
 }
 
 type EmailConfig struct {
 	SenderEmail string `yaml:"SENDER_EMAIL"`
 	SenderPass  string `yaml:"SENDER_PASSWORD"`
-}
-
-func LoadConfigs() error {
-	// Load the app.yaml file content to GlobalCfg variable
-	if err := yaml.Unmarshal(AppConfigFile, &GlobalCfg); err != nil {
-		return errors.New("load configs failed")
-	}
-	return nil
 }
 
 func GetDBConfig() *DatabaseConfig {

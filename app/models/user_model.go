@@ -14,7 +14,7 @@ const (
 type User struct {
 	gorm.Model
 	Username         string `gorm:"uniqueIndex;not null"`
-	Email            string `gorm:"uniqueIndex,omitempty"`
+	Email            string `gorm:"uniqueIndex,omitempty;default:null"`
 	KeepEmailPrivate bool   `gorm:"default:1"`
 	Password         string `gorm:"not null"`
 	Role             uint   `gorm:"default:2"`
@@ -28,8 +28,8 @@ type User struct {
 	Image        string
 }
 
-func (u *User) HashPassword(plain string) error {
-	h, err := bcrypt.GenerateFromPassword([]byte(plain), bcrypt.DefaultCost)
+func (u *User) HashPassword() error {
+	h, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
@@ -38,8 +38,7 @@ func (u *User) HashPassword(plain string) error {
 }
 
 func (u *User) CheckPassword(plain string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plain))
-	return err
+	return bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plain))
 }
 
 func (u *User) ExtractEmail() string {

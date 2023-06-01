@@ -24,7 +24,7 @@ func (us *UserStore) GetUserByUsername(username string, u *models.User) error {
 }
 
 func (us *UserStore) GetUserByUsernameOrEmail(username, email string, u *models.User) error {
-	return us.db.Where("username = ?", username).Or("email = ?", email).First(u).Error
+	return us.db.Where("username = ?", username).Or("email = ? AND email IS NOT NULL", email).First(u).Error
 }
 
 func (us *UserStore) UpdateUser(u *models.User) error {

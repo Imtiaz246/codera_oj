@@ -1,15 +1,21 @@
 # github.com/KyleBanks/depth v1.2.1
 ## explicit
 github.com/KyleBanks/depth
+# github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da
+## explicit
+github.com/aead/chacha20/chacha
+# github.com/aead/chacha20poly1305 v0.0.0-20170617001512-233f39982aeb
+## explicit
+github.com/aead/chacha20poly1305
+# github.com/aead/poly1305 v0.0.0-20180717145839-3fee0db0b635
+## explicit
+github.com/aead/poly1305
 # github.com/andybalholm/brotli v1.0.5
 ## explicit; go 1.12
 github.com/andybalholm/brotli
 # github.com/davecgh/go-spew v1.1.1
 ## explicit
 github.com/davecgh/go-spew/spew
-# github.com/go-ini/ini v1.67.0
-## explicit
-github.com/go-ini/ini
 # github.com/go-openapi/jsonpointer v0.19.6
 ## explicit; go 1.13
 github.com/go-openapi/jsonpointer
@@ -41,15 +47,9 @@ github.com/gofiber/fiber/v2/middleware/cors
 github.com/gofiber/fiber/v2/middleware/filesystem
 github.com/gofiber/fiber/v2/middleware/logger
 github.com/gofiber/fiber/v2/utils
-# github.com/gofiber/jwt/v3 v3.3.9
-## explicit; go 1.16
-github.com/gofiber/jwt/v3
 # github.com/gofiber/swagger v0.1.11
 ## explicit; go 1.16
 github.com/gofiber/swagger
-# github.com/golang-jwt/jwt/v4 v4.5.0
-## explicit; go 1.16
-github.com/golang-jwt/jwt/v4
 # github.com/google/uuid v1.3.0
 ## explicit
 github.com/google/uuid
@@ -95,9 +95,15 @@ github.com/mattn/go-runewidth
 # github.com/mattn/go-sqlite3 v1.14.15
 ## explicit; go 1.16
 github.com/mattn/go-sqlite3
+# github.com/o1egl/paseto v1.0.0
+## explicit
+github.com/o1egl/paseto
 # github.com/philhofer/fwd v1.1.2
 ## explicit; go 1.15
 github.com/philhofer/fwd
+# github.com/pkg/errors v0.8.0
+## explicit
+github.com/pkg/errors
 # github.com/pmezard/go-difflib v1.0.0
 ## explicit
 github.com/pmezard/go-difflib/difflib
@@ -144,7 +150,10 @@ github.com/valyala/tcplisten
 # golang.org/x/crypto v0.8.0
 ## explicit; go 1.17
 golang.org/x/crypto/bcrypt
+golang.org/x/crypto/blake2b
 golang.org/x/crypto/blowfish
+golang.org/x/crypto/ed25519
+golang.org/x/crypto/hkdf
 golang.org/x/crypto/sha3
 # golang.org/x/sys v0.7.0
 ## explicit; go 1.17

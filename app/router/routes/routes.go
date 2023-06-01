@@ -11,6 +11,7 @@ func RegisterRoutes(app *fiber.App, handler *handler.Handler) {
 	/* -------------------- Auth Routes Begins -------------------- */
 	auth := apiV1.Group("/auth")
 	auth.Post("/signup", handler.SignUp)
+	auth.Post("/login", handler.Login)
 	auth.Get("/verify-email/:id/:token", handler.VerifyEmail)
 	/* -------------------- Auth Routes Ends -------------------- */
 

@@ -33,6 +33,7 @@ func (h *Handler) SignUp(ctx *fiber.Ctx) error {
 	if err := u.HashPassword(); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
+
 	if err := h.UserStore.GetUserByUsernameOrEmail(u.Username, ve.Email, u); err == nil {
 		return ctx.Status(http.StatusNotAcceptable).JSON(utils.DuplicateEntry())
 	}
@@ -105,7 +106,6 @@ func (h *Handler) VerifyEmail(c *fiber.Ctx) error {
 	if err := ve.IsLinkExpired(); err != nil {
 		return c.Status(http.StatusNotAcceptable).JSON(utils.NewError(err))
 	}
-
 	u := ve.VerifiedUser()
 	if err := h.UserStore.UpdateUser(u); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))

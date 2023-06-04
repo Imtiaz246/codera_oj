@@ -75,12 +75,12 @@ func NewUserResponse(u *models.User) *UserResponse {
 	return r
 }
 
-func NewLoginResponse(u *models.User, atInfo, rtInfo *token.TokenInfo) *UserLoginResponse {
+func NewLoginResponse(u *models.User, accessTokenInfo, refreshTokenInfo *token.TokenInfo) *UserLoginResponse {
 	return &UserLoginResponse{
 		User:                  NewUserResponse(u),
-		AccessToken:           atInfo.Token,
-		AccessTokenExpiresAt:  atInfo.Payload.Exp,
-		RefreshToken:          rtInfo.Token,
-		RefreshTokenExpiresAt: rtInfo.Payload.Exp,
+		AccessToken:           accessTokenInfo.Token,
+		AccessTokenExpiresAt:  accessTokenInfo.Payload.Expiration,
+		RefreshToken:          refreshTokenInfo.Token,
+		RefreshTokenExpiresAt: refreshTokenInfo.Payload.Expiration,
 	}
 }

@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/base64"
 	"github.com/gofiber/fiber/v2"
-	apisv1 "github.com/imtiaz246/codera_oj/app/api/v1"
+	apiv1 "github.com/imtiaz246/codera_oj/app/api/v1"
 	"github.com/imtiaz246/codera_oj/app/models"
 	"github.com/imtiaz246/codera_oj/initializers/config"
 	"github.com/imtiaz246/codera_oj/services/mailer"
@@ -18,13 +18,13 @@ import (
 // @Summary SignUp a user.
 // @Description create account for a user.
 // @Tags auth
-// @Param data body apisv1.UserRegisterRequest true "data"
+// @Param data body apiv1.UserRegisterRequest true "data"
 // @Accept */*
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Router /auth/signup [post]
 func (h *Handler) SignUp(ctx *fiber.Ctx) error {
-	req := new(apisv1.UserRegisterRequest)
+	req := new(apiv1.UserRegisterRequest)
 	if err := BindAndValidate(ctx, req); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
 	}
@@ -50,7 +50,7 @@ func (h *Handler) SignUp(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 
-	return ctx.Status(http.StatusCreated).JSON(apisv1.UserSuccessfulRegistrationResponse)
+	return ctx.Status(http.StatusCreated).JSON(apiv1.UserSuccessfulRegistrationResponse)
 }
 
 // Login create access token and refresh token for a valid user
@@ -58,13 +58,13 @@ func (h *Handler) SignUp(ctx *fiber.Ctx) error {
 // @Summary Login a user.
 // @Description logs in a user if valid credentials given.
 // @Tags auth
-// @Param data body apisv1.UserLoginRequest true "data"
+// @Param data body apiv1.UserLoginRequest true "data"
 // @Accept */*
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Router /auth/login [post]
 func (h *Handler) Login(ctx *fiber.Ctx) error {
-	req := new(apisv1.UserLoginRequest)
+	req := new(apiv1.UserLoginRequest)
 	if err := BindAndValidate(ctx, req); err != nil {
 		return ctx.Status(http.StatusNotAcceptable).JSON(utils.NewError(err))
 	}
@@ -83,7 +83,7 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(apisv1.NewLoginResponse(u, at, rt))
+	return ctx.Status(http.StatusOK).JSON(apiv1.NewLoginResponse(u, at, rt))
 }
 
 // VerifyEmail verifies email of a valid user
@@ -111,10 +111,10 @@ func (h *Handler) VerifyEmail(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 
-	return c.Status(http.StatusOK).JSON(apisv1.EmailSuccessfulVerificationResponse)
+	return c.Status(http.StatusOK).JSON(apiv1.EmailSuccessfulVerificationResponse)
 }
 
-func extractRegistrationRequest(r *apisv1.UserRegisterRequest) (*models.User, *models.VerifyEmail) {
+func extractRegistrationRequest(r *apiv1.UserRegisterRequest) (*models.User, *models.VerifyEmail) {
 	u := &models.User{
 		Username: r.Username,
 		Password: r.Password,
@@ -134,31 +134,31 @@ func sendEmailVerificationMail(ve *models.VerifyEmail) error {
 		Send()
 }
 
-func getTokens(u *models.User) (at *token.TokenInfo, rt *token.TokenInfo, err error) {
-	cfg := config.GetAuthConfig()
-	key, err := base64.StdEncoding.DecodeString(cfg.Key)
+func getTokens(u *models.User) (accessTokenInfo, refreshTokenInfo *token.TokenInfo, err error) {
+	authConfig := config.GetAuthConfig()
+	key, err := base64.StdEncoding.DecodeString(authConfig.Key)
 	if err != nil {
 		return
 	}
-	tm, err := token.NewPasetoToken(key)
-	if err != nil {
-		return
-	}
-
-	ad, err := time.ParseDuration(cfg.AccessTokenDuration)
-	if err != nil {
-		return
-	}
-	at, err = tm.CreateToken(u.Username, ad)
+	tokenManager, err := token.NewPasetoToken(key)
 	if err != nil {
 		return
 	}
 
-	rd, err := time.ParseDuration(cfg.RefreshTokenDuration)
+	accessTokenDuration, err := time.ParseDuration(authConfig.AccessTokenDuration)
 	if err != nil {
 		return
 	}
-	rt, err = tm.CreateToken(u.Username, rd)
+	accessTokenInfo, err = tokenManager.CreateToken(u.Username, accessTokenDuration)
+	if err != nil {
+		return
+	}
+
+	refreshTokenDuration, err := time.ParseDuration(authConfig.RefreshTokenDuration)
+	if err != nil {
+		return
+	}
+	refreshTokenInfo, err = tokenManager.CreateToken(u.Username, refreshTokenDuration)
 	if err != nil {
 		return
 	}

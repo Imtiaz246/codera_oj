@@ -1,6 +1,7 @@
 package token
 
 import (
+	"github.com/o1egl/paseto"
 	"time"
 )
 
@@ -14,10 +15,10 @@ const (
 
 type TokenManager interface {
 	CreateToken(username string, duration time.Duration) (*TokenInfo, error)
-	VerifyToken(token string) (*Payload, error)
+	VerifyToken(token string) (*paseto.JSONToken, error)
 }
 
 type TokenInfo struct {
 	Token   string
-	Payload *Payload
+	Payload *paseto.JSONToken
 }

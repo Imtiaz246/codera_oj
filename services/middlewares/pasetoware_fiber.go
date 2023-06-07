@@ -45,22 +45,22 @@ func New(config *Config) fiber.Handler {
 			return fmt.Errorf("token not found")
 		}
 
-		result := new(paseto.JSONToken)
+		pasetoPayload := new(paseto.JSONToken)
 		key, err := base64.StdEncoding.DecodeString(config.SymmetricKey)
 		if err != nil {
 			return fmt.Errorf("token decoding failed: %v", err)
 		}
 
-		err = decryptor.Decrypt(token, key, result, nil)
+		err = decryptor.Decrypt(token, key, pasetoPayload, nil)
 		if err != nil {
 			return fmt.Errorf("invalid token: %v", err)
 		}
 
-		if time.Now().After(result.Expiration) {
-			return fmt.Errorf("token has expired, expired time is: %v", result.Expiration)
+		if time.Now().After(pasetoPayload.Expiration) {
+			return fmt.Errorf("token has expired, expired time is: %v", pasetoPayload.Expiration)
 		}
 
-		ctx.Locals(config.ContextKey, result)
+		ctx.Locals(config.ContextKey, pasetoPayload)
 
 		return ctx.Next()
 	}

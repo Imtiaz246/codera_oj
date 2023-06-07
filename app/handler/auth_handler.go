@@ -91,7 +91,7 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 	newClaimsInfo := &token.ClaimsInfo{
 		Username:  u.Username,
 		ClientIP:  ctx.IP(),
-		UserAgent: string(ctx.Request().Host()),
+		UserAgent: ctx.GetReqHeaders()["User-Agent"],
 	}
 	accessTokenInfo, refreshTokenInfo, err := getTokens(newClaimsInfo)
 	if err != nil {
@@ -157,13 +157,14 @@ func (h *Handler) RenewToken(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
 	}
 
-	userClaimsInfo := &token.ClaimsInfo{
+	claimsInfo := &token.ClaimsInfo{
 		Username:  pasetoPayload.Get("username"),
 		ClientIP:  pasetoPayload.Get("clientIP"),
 		UserAgent: pasetoPayload.Get("userAgent"),
 	}
 	tokenID := pasetoPayload.Jti
 
+	// Get the session from session_cache or database
 	session := new(models.Sessions)
 	session, err = session_cache.Get(tokenID)
 	if err != nil {
@@ -175,18 +176,29 @@ func (h *Handler) RenewToken(ctx *fiber.Ctx) error {
 			return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 		}
 	}
-
 	if session.IsBlocked {
 		return ctx.Status(http.StatusUnauthorized).JSON(utils.NewError(ErrTokenIsBlocked))
 	}
 
-	accessTokenInfo, err := getAccessToken(userClaimsInfo)
+	// Check for token corruption
+	if ctx.IP() != claimsInfo.ClientIP || ctx.GetReqHeaders()["User-Agent"] != claimsInfo.UserAgent {
+		session.IsBlocked = true
+		if err := session_cache.Set(session.ID.String(), session); err != nil {
+			return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+		}
+		if err := h.SessionStore.UpdateSession(session); err != nil {
+			return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+		}
+		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(ErrTokenIsBlocked))
+	}
+
+	accessTokenInfo, err := getAccessToken(claimsInfo)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 
 	user := new(models.User)
-	if err := h.UserStore.GetUserByUsername(userClaimsInfo.Username, user); err != nil {
+	if err := h.UserStore.GetUserByUsername(claimsInfo.Username, user); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 

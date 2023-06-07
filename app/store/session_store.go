@@ -22,3 +22,7 @@ func (ss *SessionStore) Create(s *models.Sessions) error {
 func (ss *SessionStore) GetBySessionID(id string, s *models.Sessions) error {
 	return ss.db.Where("ID = ?", id).First(s).Error
 }
+
+func (ss *SessionStore) UpdateSession(s *models.Sessions) error {
+	return ss.db.Save(s).Error
+}

@@ -13,12 +13,21 @@ const (
 	ErrExpiredToken = "token is expired"
 )
 
+// TokenManager is the interface for managing tokens
 type TokenManager interface {
-	CreateToken(username string, duration time.Duration) (*TokenInfo, error)
+	CreateToken(claimsInfo *ClaimsInfo, duration time.Duration) (*TokenInfo, error)
 	VerifyToken(token string) (*paseto.JSONToken, error)
 }
 
+// TokenInfo holds the information related to a token
 type TokenInfo struct {
 	Token   string
 	Payload *paseto.JSONToken
+}
+
+// ClaimsInfo holds the claims information for a user
+type ClaimsInfo struct {
+	Username  string
+	ClientIP  string
+	UserAgent string
 }

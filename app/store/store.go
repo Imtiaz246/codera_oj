@@ -9,6 +9,7 @@ type Store struct {
 	DB               *gorm.DB
 	UserStore        *UserStore
 	VerifyEmailStore *VerifyEmailStore
+	SessionStore     *SessionStore
 }
 
 func NewStore() (*Store, error) {
@@ -16,6 +17,7 @@ func NewStore() (*Store, error) {
 	return &Store{
 		DB:               newDB,
 		UserStore:        newUserStore(newDB),
-		VerifyEmailStore: NewVerifyEmailStore(newDB),
+		VerifyEmailStore: newVerifyEmailStore(newDB),
+		SessionStore:     newSessionStore(newDB),
 	}, nil
 }

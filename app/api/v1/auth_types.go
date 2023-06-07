@@ -45,6 +45,12 @@ type RequestedUser struct {
 	Email    string `json:"email"`
 }
 
+type RenewTokenResponse struct {
+	User                 *UserResponse `json:"user"`
+	AccessToken          string        `json:"accessToken"`
+	AccessTokenExpiresAt time.Time     `json:"accessTokenExpiresAt"`
+}
+
 type UserResponse struct {
 	ID           uint   `json:"id"`
 	Username     string `json:"username"`
@@ -82,5 +88,13 @@ func NewLoginResponse(u *models.User, accessTokenInfo, refreshTokenInfo *token.T
 		AccessTokenExpiresAt:  accessTokenInfo.Payload.Expiration,
 		RefreshToken:          refreshTokenInfo.Token,
 		RefreshTokenExpiresAt: refreshTokenInfo.Payload.Expiration,
+	}
+}
+
+func NewRenewTokenResponse(u *models.User, accessTokenInfo *token.TokenInfo) *RenewTokenResponse {
+	return &RenewTokenResponse{
+		User:                 NewUserResponse(u),
+		AccessToken:          accessTokenInfo.Token,
+		AccessTokenExpiresAt: accessTokenInfo.Payload.Expiration,
 	}
 }

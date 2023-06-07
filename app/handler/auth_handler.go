@@ -2,15 +2,25 @@ package handler
 
 import (
 	"encoding/base64"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	apiv1 "github.com/imtiaz246/codera_oj/app/api/v1"
 	"github.com/imtiaz246/codera_oj/app/models"
+	"github.com/imtiaz246/codera_oj/app/store"
 	"github.com/imtiaz246/codera_oj/initializers/config"
+	"github.com/imtiaz246/codera_oj/initializers/session_cache"
 	"github.com/imtiaz246/codera_oj/services/mailer"
 	"github.com/imtiaz246/codera_oj/services/token"
 	"github.com/imtiaz246/codera_oj/utils"
+	"github.com/o1egl/paseto"
 	"net/http"
 	"time"
+)
+
+var (
+	ErrTokenIsBlocked  = fmt.Errorf("token is blocked")
+	ErrTokenIsNotValid = fmt.Errorf("token is not valid")
 )
 
 // SignUp signs up a user
@@ -19,7 +29,7 @@ import (
 // @Description create account for a user.
 // @Tags auth
 // @Param data body apiv1.UserRegisterRequest true "data"
-// @Accept */*
+// @Accept application/json
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Router /auth/signup [post]
@@ -59,9 +69,9 @@ func (h *Handler) SignUp(ctx *fiber.Ctx) error {
 // @Description logs in a user if valid credentials given.
 // @Tags auth
 // @Param data body apiv1.UserLoginRequest true "data"
-// @Accept */*
+// @Accept application/json
 // @Produce json
-// @Success 200 {object} map[string]interface{}
+// @Success 200 {object} apiv1.UserLoginResponse
 // @Router /auth/login [post]
 func (h *Handler) Login(ctx *fiber.Ctx) error {
 	req := new(apiv1.UserLoginRequest)
@@ -78,12 +88,27 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusUnauthorized).JSON(utils.NewError(err))
 	}
 
-	// todo: add sessions and cookies
-	at, rt, err := getTokens(u)
+	newClaimsInfo := &token.ClaimsInfo{
+		Username:  u.Username,
+		ClientIP:  ctx.IP(),
+		UserAgent: string(ctx.Request().Host()),
+	}
+	accessTokenInfo, refreshTokenInfo, err := getTokens(newClaimsInfo)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
-	return ctx.Status(http.StatusOK).JSON(apiv1.NewLoginResponse(u, at, rt))
+	session, err := createSessionFromTokenInfo(refreshTokenInfo, h.UserStore)
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+	}
+	if err := session_cache.Set(session.ID.String(), session); err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+	}
+	if err := h.SessionStore.Create(session); err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+	}
+
+	return ctx.Status(http.StatusOK).JSON(apiv1.NewLoginResponse(u, accessTokenInfo, refreshTokenInfo))
 }
 
 // VerifyEmail verifies email of a valid user
@@ -93,27 +118,82 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 // @Tags auth
 // @Param id path string true "token ID"
 // @Param token path string true "token"
-// @Accept */*
+// @Accept application/json
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Router /auth/verify-email/{id}/{token} [get]
-func (h *Handler) VerifyEmail(c *fiber.Ctx) error {
+func (h *Handler) VerifyEmail(ctx *fiber.Ctx) error {
 	ve := new(models.VerifyEmail)
 
-	if err := h.VerifyEmailStore.GetIDToken(c.Params("id"), c.Params("token"), ve); err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+	if err := h.VerifyEmailStore.GetIDToken(ctx.Params("id"), ctx.Params("token"), ve); err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 	if err := ve.IsLinkExpired(); err != nil {
-		return c.Status(http.StatusNotAcceptable).JSON(utils.NewError(err))
+		return ctx.Status(http.StatusNotAcceptable).JSON(utils.NewError(err))
 	}
 	u := ve.VerifiedUser()
 	if err := h.UserStore.UpdateUser(u); err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 
-	return c.Status(http.StatusOK).JSON(apiv1.EmailSuccessfulVerificationResponse)
+	return ctx.Status(http.StatusOK).JSON(apiv1.EmailSuccessfulVerificationResponse)
 }
 
+// RenewToken renews the access token using a valid refresh token
+// HealthCheck godoc
+// @Summary Renew the access token
+// @Description Renew the access token using the refresh token
+// @Tags auth
+// @Param username path string true "username"
+// @Param refresh-token query string true "refresh token" minlength(1)
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /auth/{username}/renew-token [get]
+func (h *Handler) RenewToken(ctx *fiber.Ctx) error {
+	refreshToken := ctx.Query("refresh-token")
+	pasetoPayload, err := getPasetoJsonPayload(refreshToken)
+	if err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
+	}
+
+	userClaimsInfo := &token.ClaimsInfo{
+		Username:  pasetoPayload.Get("username"),
+		ClientIP:  pasetoPayload.Get("clientIP"),
+		UserAgent: pasetoPayload.Get("userAgent"),
+	}
+	tokenID := pasetoPayload.Jti
+
+	session := new(models.Sessions)
+	session, err = session_cache.Get(tokenID)
+	if err != nil {
+		if err := h.SessionStore.GetBySessionID(tokenID, session); err != nil {
+			return ctx.Status(http.StatusNotAcceptable).JSON(utils.NewError(ErrTokenIsNotValid))
+		}
+
+		if err := session_cache.Set(tokenID, session); err != nil {
+			return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+		}
+	}
+
+	if session.IsBlocked {
+		return ctx.Status(http.StatusUnauthorized).JSON(utils.NewError(ErrTokenIsBlocked))
+	}
+
+	accessTokenInfo, err := getAccessToken(userClaimsInfo)
+	if err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+	}
+
+	user := new(models.User)
+	if err := h.UserStore.GetUserByUsername(userClaimsInfo.Username, user); err != nil {
+		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
+	}
+
+	return ctx.Status(http.StatusOK).JSON(apiv1.NewRenewTokenResponse(user, accessTokenInfo))
+}
+
+// extractRegistrationRequest extracts information for user registration request
 func extractRegistrationRequest(r *apiv1.UserRegisterRequest) (*models.User, *models.VerifyEmail) {
 	u := &models.User{
 		Username: r.Username,
@@ -126,6 +206,7 @@ func extractRegistrationRequest(r *apiv1.UserRegisterRequest) (*models.User, *mo
 	return u, ve
 }
 
+// sendEmailVerificationMail sends email verification mail to user
 func sendEmailVerificationMail(ve *models.VerifyEmail) error {
 	return mailer.NewMailer().
 		To([]string{ve.ExtractEmail()}).
@@ -134,13 +215,23 @@ func sendEmailVerificationMail(ve *models.VerifyEmail) error {
 		Send()
 }
 
-func getTokens(u *models.User) (accessTokenInfo, refreshTokenInfo *token.TokenInfo, err error) {
-	authConfig := config.GetAuthConfig()
+// getTokenManager get the token manager
+func getTokenManager(authConfig *config.AuthConfig) (token.TokenManager, error) {
 	key, err := base64.StdEncoding.DecodeString(authConfig.Key)
 	if err != nil {
-		return
+		return nil, err
 	}
 	tokenManager, err := token.NewPasetoToken(key)
+	if err != nil {
+		return nil, err
+	}
+	return tokenManager, nil
+}
+
+// getTokens returns access token and refresh token for a valid user
+func getTokens(claimsInfo *token.ClaimsInfo) (accessTokenInfo, refreshTokenInfo *token.TokenInfo, err error) {
+	authConfig := config.GetAuthConfig()
+	tokenManager, err := getTokenManager(authConfig)
 	if err != nil {
 		return
 	}
@@ -149,7 +240,7 @@ func getTokens(u *models.User) (accessTokenInfo, refreshTokenInfo *token.TokenIn
 	if err != nil {
 		return
 	}
-	accessTokenInfo, err = tokenManager.CreateToken(u.Username, accessTokenDuration)
+	accessTokenInfo, err = tokenManager.CreateToken(claimsInfo, accessTokenDuration)
 	if err != nil {
 		return
 	}
@@ -158,10 +249,75 @@ func getTokens(u *models.User) (accessTokenInfo, refreshTokenInfo *token.TokenIn
 	if err != nil {
 		return
 	}
-	refreshTokenInfo, err = tokenManager.CreateToken(u.Username, refreshTokenDuration)
+	refreshTokenInfo, err = tokenManager.CreateToken(claimsInfo, refreshTokenDuration)
 	if err != nil {
 		return
 	}
 
 	return
+}
+
+// getAccessToken get the access token with claims and returns the TokenInfo
+func getAccessToken(claimsInfo *token.ClaimsInfo) (accessTokenInfo *token.TokenInfo, err error) {
+	authConfig := config.GetAuthConfig()
+	tokenManager, err := getTokenManager(authConfig)
+	if err != nil {
+		return
+	}
+
+	accessTokenDuration, err := time.ParseDuration(authConfig.AccessTokenDuration)
+	if err != nil {
+		return
+	}
+	accessTokenInfo, err = tokenManager.CreateToken(claimsInfo, accessTokenDuration)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// getTokenPayload verifies the token and returns the paseto json payload
+func getPasetoJsonPayload(tokenStr string) (*paseto.JSONToken, error) {
+	authConfig := config.GetAuthConfig()
+	key, err := base64.StdEncoding.DecodeString(authConfig.Key)
+	if err != nil {
+		return nil, err
+	}
+
+	tokenManager, err := token.NewPasetoToken(key)
+	if err != nil {
+		return nil, err
+	}
+
+	pasetoPayload, err := tokenManager.VerifyToken(tokenStr)
+	if err != nil {
+		return nil, err
+	}
+	return pasetoPayload, nil
+}
+
+// createSessionFromTokenInfo creates session from token info
+func createSessionFromTokenInfo(tokenInfo *token.TokenInfo, userStore *store.UserStore) (*models.Sessions, error) {
+	tokenUUID, err := uuid.Parse(tokenInfo.Payload.Jti)
+	if err != nil {
+		return nil, err
+	}
+	user := new(models.User)
+	if err := userStore.GetUserByUsername(tokenInfo.Payload.Get("username"), user); err != nil {
+		return nil, err
+	}
+	session := &models.Sessions{
+		ID:        tokenUUID,
+		User:      user,
+		UserId:    user.ID,
+		UserAgent: tokenInfo.Payload.Get("userAgent"),
+		ClientIP:  tokenInfo.Payload.Get("clientIP"),
+		IsBlocked: false,
+		ExpiresAt: tokenInfo.Payload.Expiration,
+		CreatedAt: tokenInfo.Payload.IssuedAt,
+		UpdatedAt: tokenInfo.Payload.IssuedAt,
+	}
+
+	return session, nil
 }

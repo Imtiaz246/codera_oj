@@ -10,7 +10,7 @@ type Sessions struct {
 	UserId    uint
 	User      *User
 	UserAgent string
-	IsBlocked bool
+	IsBlocked bool `gorm:"default:0"`
 	ClientIP  string
 	ExpiresAt time.Time
 

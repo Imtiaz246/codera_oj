@@ -38,39 +38,40 @@ func NewPasetoToken(symmetricKey []byte) (TokenManager, error) {
 }
 
 // CreateToken creates a new token for a specific username and duration
-func (pt *PasetoToken) CreateToken(username string, duration time.Duration) (*TokenInfo, error) {
-	pasetoTokenPayload, err := NewPasetoPayload(username, duration)
+func (pt *PasetoToken) CreateToken(claimsInfo *ClaimsInfo, duration time.Duration) (*TokenInfo, error) {
+	pasetoPayload, err := NewPasetoPayload(claimsInfo, duration)
 	if err != nil {
 		return nil, err
 	}
 
-	token, err := pt.paseto.Encrypt(pt.symmetricKey, pasetoTokenPayload, nil)
+	token, err := pt.paseto.Encrypt(pt.symmetricKey, pasetoPayload, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	return &TokenInfo{
 		Token:   token,
-		Payload: pasetoTokenPayload,
+		Payload: pasetoPayload,
 	}, nil
 }
 
-// VerifyToken verifies if the given token is valid or not
+// VerifyToken verifies if the given token is valid or not.
+// And also returns the payload if the token is valid.
 func (pt *PasetoToken) VerifyToken(token string) (*paseto.JSONToken, error) {
-	var pasetoTokenPayload *paseto.JSONToken
-	if err := pt.paseto.Decrypt(token, pt.symmetricKey, pasetoTokenPayload, nil); err != nil {
+	pasetoPayload := new(paseto.JSONToken)
+	if err := pt.paseto.Decrypt(token, pt.symmetricKey, pasetoPayload, nil); err != nil {
 		return nil, fmt.Errorf(ErrInvalidToken, err)
 	}
 
-	if time.Now().After(pasetoTokenPayload.Expiration) {
-		return nil, fmt.Errorf("token has expired")
+	if time.Now().After(pasetoPayload.Expiration) {
+		return nil, fmt.Errorf(ErrExpiredToken)
 	}
 
-	return pasetoTokenPayload, nil
+	return pasetoPayload, nil
 }
 
 // NewPasetoPayload creates Payload instance for specific username and duration
-func NewPasetoPayload(username string, duration time.Duration) (*paseto.JSONToken, error) {
+func NewPasetoPayload(claimsInfo *ClaimsInfo, duration time.Duration) (*paseto.JSONToken, error) {
 	tokenID, err := uuid.NewRandom()
 	if err != nil {
 		return nil, err
@@ -84,7 +85,9 @@ func NewPasetoPayload(username string, duration time.Duration) (*paseto.JSONToke
 		IssuedAt:   curTime,
 		Jti:        tokenID.String(),
 	}
-	pasetoTokenPayload.Set("username", username)
+	pasetoTokenPayload.Set("username", claimsInfo.Username)
+	pasetoTokenPayload.Set("clientIP", claimsInfo.ClientIP)
+	pasetoTokenPayload.Set("userAgent", claimsInfo.UserAgent)
 
 	return pasetoTokenPayload, nil
 }

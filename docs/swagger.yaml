@@ -12,6 +12,19 @@ definitions:
     required:
     - password
     type: object
+  v1.UserLoginResponse:
+    properties:
+      AccessToken:
+        type: string
+      AccessTokenExpiresAt:
+        type: string
+      RefreshToken:
+        type: string
+      RefreshTokenExpiresAt:
+        type: string
+      User:
+        $ref: '#/definitions/v1.UserResponse'
+    type: object
   v1.UserRegisterRequest:
     properties:
       email:
@@ -24,6 +37,27 @@ definitions:
     required:
     - password
     - username
+    type: object
+  v1.UserResponse:
+    properties:
+      city:
+        type: string
+      country:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      last_name:
+        type: string
+      organization:
+        type: string
+      username:
+        type: string
     type: object
   v1.UserUpdatePasswordRequest:
     properties:
@@ -65,10 +99,38 @@ info:
   title: Fiber Example API
   version: "2.0"
 paths:
+  /auth/{username}/renew-token:
+    get:
+      consumes:
+      - application/json
+      description: Renew the access token using the refresh token
+      parameters:
+      - description: username
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: refresh token
+        in: query
+        minLength: 1
+        name: refresh-token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Renew the access token
+      tags:
+      - auth
   /auth/login:
     post:
       consumes:
-      - '*/*'
+      - application/json
       description: logs in a user if valid credentials given.
       parameters:
       - description: data
@@ -83,15 +145,14 @@ paths:
         "200":
           description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/v1.UserLoginResponse'
       summary: Login a user.
       tags:
       - auth
   /auth/signup:
     post:
       consumes:
-      - '*/*'
+      - application/json
       description: create account for a user.
       parameters:
       - description: data
@@ -114,7 +175,7 @@ paths:
   /auth/verify-email/{id}/{token}:
     get:
       consumes:
-      - '*/*'
+      - application/json
       description: Verify email address.
       parameters:
       - description: token ID

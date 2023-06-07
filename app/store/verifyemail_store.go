@@ -9,7 +9,7 @@ type VerifyEmailStore struct {
 	db *gorm.DB
 }
 
-func NewVerifyEmailStore(db *gorm.DB) *VerifyEmailStore {
+func newVerifyEmailStore(db *gorm.DB) *VerifyEmailStore {
 	return &VerifyEmailStore{
 		db: db,
 	}

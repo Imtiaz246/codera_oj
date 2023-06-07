@@ -28,7 +28,7 @@ const docTemplate = `{
             "post": {
                 "description": "logs in a user if valid credentials given.",
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -52,8 +52,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/v1.UserLoginResponse"
                         }
                     }
                 }
@@ -63,7 +62,7 @@ const docTemplate = `{
             "post": {
                 "description": "create account for a user.",
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -98,7 +97,7 @@ const docTemplate = `{
             "get": {
                 "description": "Verify email address.",
                 "consumes": [
-                    "*/*"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -120,6 +119,47 @@ const docTemplate = `{
                         "description": "token",
                         "name": "token",
                         "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/{username}/renew-token": {
+            "get": {
+                "description": "Renew the access token using the refresh token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Renew the access token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "minLength": 1,
+                        "type": "string",
+                        "description": "refresh token",
+                        "name": "refresh-token",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -269,6 +309,26 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.UserLoginResponse": {
+            "type": "object",
+            "properties": {
+                "AccessToken": {
+                    "type": "string"
+                },
+                "AccessTokenExpiresAt": {
+                    "type": "string"
+                },
+                "RefreshToken": {
+                    "type": "string"
+                },
+                "RefreshTokenExpiresAt": {
+                    "type": "string"
+                },
+                "User": {
+                    "$ref": "#/definitions/v1.UserResponse"
+                }
+            }
+        },
         "v1.UserRegisterRequest": {
             "type": "object",
             "required": [
@@ -282,6 +342,38 @@ const docTemplate = `{
                 "password": {
                     "type": "string",
                     "minLength": 6
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.UserResponse": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "organization": {
+                    "type": "string"
                 },
                 "username": {
                     "type": "string"

@@ -76,5 +76,11 @@ func doAutoMigrations(db *gorm.DB) error {
 		&models.User{},
 		&models.Problem{},
 		&models.Contest{},
-		&models.VerifyEmail{})
+		&models.VerifyEmail{},
+		&models.Sessions{})
+}
+
+// IsDBInitialized checks if the database is already initialized or not
+func IsDBInitialized() bool {
+	return db != nil
 }

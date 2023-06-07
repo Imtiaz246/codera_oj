@@ -19,11 +19,11 @@ type Config struct {
 	SymmetricKey string
 }
 
-// NewDefaultConfig returns default configuration for the token middleware
-func NewDefaultConfig() *Config {
+// NewPasetoDefaultConfig returns default configuration for the token middleware
+func NewPasetoDefaultConfig() *Config {
 	authConfig := config.GetAuthConfig()
 	return &Config{
-		TokenLookup:  "header:" + fiber.HeaderAuthorization,
+		TokenLookup:  fmt.Sprintf("header:%s,cookie:token", fiber.HeaderAuthorization),
 		ContextKey:   "payload",
 		Filter:       nil,
 		AuthScheme:   "Bearer",

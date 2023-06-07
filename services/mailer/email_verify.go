@@ -2,7 +2,7 @@ package mailer
 
 import (
 	"bytes"
-	"github.com/imtiaz246/codera_oj/app/models"
+	"github.com/imtiaz246/codera_oj/models"
 	"text/template"
 )
 

@@ -2,8 +2,8 @@ package db
 
 import (
 	"fmt"
-	"github.com/imtiaz246/codera_oj/app/models"
 	"github.com/imtiaz246/codera_oj/initializers/config"
+	models2 "github.com/imtiaz246/codera_oj/models"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -73,11 +73,11 @@ func connSqliteDB() (err error) {
 // doAutoMigrations apply auto migration for models
 func doAutoMigrations(db *gorm.DB) error {
 	return db.AutoMigrate(
-		&models.User{},
-		&models.Problem{},
-		&models.Contest{},
-		&models.VerifyEmail{},
-		&models.Sessions{})
+		&models2.User{},
+		&models2.Problem{},
+		&models2.Contest{},
+		&models2.VerifyEmail{},
+		&models2.Sessions{})
 }
 
 // IsDBInitialized checks if the database is already initialized or not

@@ -16,6 +16,9 @@ func Initialize() error {
 	if err := session_cache.LoadSessionCache(); err != nil {
 		return err
 	}
+	if err := session_cache.InitializeSessionCleanUp_CronJob(); err != nil {
+		return err
+	}
 
 	return nil
 }

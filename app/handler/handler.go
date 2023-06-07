@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/imtiaz246/codera_oj/app/store"
+	"github.com/imtiaz246/codera_oj/store"
 )
 
 type Handler struct {

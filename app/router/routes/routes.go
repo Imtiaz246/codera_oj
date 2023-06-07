@@ -19,8 +19,9 @@ func RegisterRoutes(app *fiber.App, handler *handler.Handler) {
 
 	/* -------------------- User Routes Begins -------------------- */
 	user := apiV1.Group("/users")
-	user.Use(middlewares.New(middlewares.NewPasetoDefaultConfig()))
 	user.Get("/:username", handler.GetUserByUsername)
+
+	user.Use(middlewares.New(middlewares.NewPasetoDefaultConfig()))
 	user.Put("/:username", handler.UpdateUser)
 	user.Put("/:username/password", handler.UpdatePassword)
 	/* -------------------- User Routes Ends -------------------- */

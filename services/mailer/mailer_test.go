@@ -1,8 +1,8 @@
 package mailer
 
 import (
-	models2 "github.com/imtiaz246/codera_oj/app/models"
 	"github.com/imtiaz246/codera_oj/initializers"
+	"github.com/imtiaz246/codera_oj/models"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
@@ -14,11 +14,11 @@ func init() {
 	}
 }
 func TestMailer(t *testing.T) {
-	user := models2.User{
+	user := models.User{
 		Username: "imtiaz_email_test",
 		Email:    "imtiazuddincho246@gmail.com",
 	}
-	evm := models2.VerifyEmail{
+	evm := models.VerifyEmail{
 		Email:          "imtiazuddincho246@gmail.com",
 		UserId:         1,
 		User:           user,

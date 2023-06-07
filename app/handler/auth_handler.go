@@ -6,12 +6,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	apiv1 "github.com/imtiaz246/codera_oj/app/api/v1"
-	"github.com/imtiaz246/codera_oj/app/models"
-	"github.com/imtiaz246/codera_oj/app/store"
 	"github.com/imtiaz246/codera_oj/initializers/config"
 	"github.com/imtiaz246/codera_oj/initializers/session_cache"
+	models2 "github.com/imtiaz246/codera_oj/models"
 	"github.com/imtiaz246/codera_oj/services/mailer"
 	"github.com/imtiaz246/codera_oj/services/token"
+	"github.com/imtiaz246/codera_oj/store"
 	"github.com/imtiaz246/codera_oj/utils"
 	"github.com/o1egl/paseto"
 	"net/http"
@@ -79,7 +79,7 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusNotAcceptable).JSON(utils.NewError(err))
 	}
 
-	u := new(models.User)
+	u := new(models2.User)
 	if err := h.UserStore.GetUserByUsernameOrEmail(req.Username, req.Email, u); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
 	}
@@ -123,7 +123,7 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 // @Success 200 {object} map[string]interface{}
 // @Router /auth/verify-email/{id}/{token} [get]
 func (h *Handler) VerifyEmail(ctx *fiber.Ctx) error {
-	ve := new(models.VerifyEmail)
+	ve := new(models2.VerifyEmail)
 
 	if err := h.VerifyEmailStore.GetIDToken(ctx.Params("id"), ctx.Params("token"), ve); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
@@ -165,7 +165,7 @@ func (h *Handler) RenewToken(ctx *fiber.Ctx) error {
 	tokenID := pasetoPayload.Jti
 
 	// Get the session from session_cache or database
-	session := new(models.Sessions)
+	session := new(models2.Sessions)
 	session, err = session_cache.Get(tokenID)
 	if err != nil {
 		if err := h.SessionStore.GetBySessionID(tokenID, session); err != nil {
@@ -197,7 +197,7 @@ func (h *Handler) RenewToken(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 
-	user := new(models.User)
+	user := new(models2.User)
 	if err := h.UserStore.GetUserByUsername(claimsInfo.Username, user); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
@@ -206,12 +206,12 @@ func (h *Handler) RenewToken(ctx *fiber.Ctx) error {
 }
 
 // extractRegistrationRequest extracts information for user registration request
-func extractRegistrationRequest(r *apiv1.UserRegisterRequest) (*models.User, *models.VerifyEmail) {
-	u := &models.User{
+func extractRegistrationRequest(r *apiv1.UserRegisterRequest) (*models2.User, *models2.VerifyEmail) {
+	u := &models2.User{
 		Username: r.Username,
 		Password: r.Password,
 	}
-	ve := &models.VerifyEmail{
+	ve := &models2.VerifyEmail{
 		Email: r.Email,
 	}
 
@@ -219,7 +219,7 @@ func extractRegistrationRequest(r *apiv1.UserRegisterRequest) (*models.User, *mo
 }
 
 // sendEmailVerificationMail sends email verification mail to user
-func sendEmailVerificationMail(ve *models.VerifyEmail) error {
+func sendEmailVerificationMail(ve *models2.VerifyEmail) error {
 	return mailer.NewMailer().
 		To([]string{ve.ExtractEmail()}).
 		WithSubject("Codera OJ Email Verification").
@@ -310,16 +310,16 @@ func getPasetoJsonPayload(tokenStr string) (*paseto.JSONToken, error) {
 }
 
 // createSessionFromTokenInfo creates session from token info
-func createSessionFromTokenInfo(tokenInfo *token.TokenInfo, userStore *store.UserStore) (*models.Sessions, error) {
+func createSessionFromTokenInfo(tokenInfo *token.TokenInfo, userStore *store.UserStore) (*models2.Sessions, error) {
 	tokenUUID, err := uuid.Parse(tokenInfo.Payload.Jti)
 	if err != nil {
 		return nil, err
 	}
-	user := new(models.User)
+	user := new(models2.User)
 	if err := userStore.GetUserByUsername(tokenInfo.Payload.Get("username"), user); err != nil {
 		return nil, err
 	}
-	session := &models.Sessions{
+	session := &models2.Sessions{
 		ID:        tokenUUID,
 		User:      user,
 		UserId:    user.ID,

@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"github.com/imtiaz246/codera_oj/app/models"
+	"github.com/imtiaz246/codera_oj/models"
 	"github.com/imtiaz246/codera_oj/services/token"
 	"time"
 )

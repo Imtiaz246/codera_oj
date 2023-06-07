@@ -2,8 +2,8 @@ package session_cache
 
 import (
 	"fmt"
-	"github.com/imtiaz246/codera_oj/app/models"
 	"github.com/imtiaz246/codera_oj/initializers/db"
+	"github.com/imtiaz246/codera_oj/models"
 )
 
 // sessionCache is the global cache for managing user sessions
@@ -49,4 +49,9 @@ func Set(key string, value *models.Sessions) error {
 		}
 	}
 	return fmt.Errorf("internal server problem. Key has not been saved")
+}
+
+// DeleteFromSessionCache deletes a key from sessionCache map
+func DeleteFromSessionCache(key string) {
+	delete(sessionCache, key)
 }

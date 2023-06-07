@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/gofiber/fiber/v2"
 	apiv1 "github.com/imtiaz246/codera_oj/app/api/v1"
-	"github.com/imtiaz246/codera_oj/app/models"
+	"github.com/imtiaz246/codera_oj/models"
 	"github.com/imtiaz246/codera_oj/utils"
 	"net/http"
 )

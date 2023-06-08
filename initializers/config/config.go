@@ -81,3 +81,7 @@ func GetEmailConfig() *EmailConfig {
 func GetServerConfig() *ServerConfig {
 	return &GlobalCfg.Server
 }
+
+func GetAppConfig() *AppConfig {
+	return &GlobalCfg.App
+}

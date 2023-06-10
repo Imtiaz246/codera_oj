@@ -6,7 +6,6 @@ import (
 	"github.com/imtiaz246/codera_oj/app/handler"
 	"github.com/imtiaz246/codera_oj/initializers/config"
 	"github.com/imtiaz246/codera_oj/services/middlewares"
-	"time"
 )
 
 func RegisterRoutes(app *fiber.App, handler *handler.Handler) {

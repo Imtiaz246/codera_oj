@@ -6,6 +6,7 @@ import (
 	"github.com/imtiaz246/codera_oj/app/handler"
 	"github.com/imtiaz246/codera_oj/initializers/config"
 	"github.com/imtiaz246/codera_oj/services/middlewares"
+	"time"
 )
 
 func RegisterRoutes(app *fiber.App, handler *handler.Handler) {
@@ -28,6 +29,7 @@ func RegisterRoutes(app *fiber.App, handler *handler.Handler) {
 	apiV1 := app.Group("/api/v1")
 	/* -------------------- Auth Routes Begins -------------------- */
 	auth := apiV1.Group("/auth")
+	auth.Use(csrf.New())
 	auth.Post("/signup", handler.SignUp)
 	auth.Post("/login", handler.Login)
 	auth.Get("/renew-token", handler.RenewToken)

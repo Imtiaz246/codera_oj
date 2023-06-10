@@ -9,7 +9,6 @@ import (
 )
 
 func RegisterRoutes(app *fiber.App, handler *handler.Handler) {
-	apiV1 := app.Group("/api/v1")
 	isRunningOnProdMode := func() bool {
 		appConfig := config.GetAppConfig()
 		if appConfig.RunMode == "dev" {
@@ -26,6 +25,7 @@ func RegisterRoutes(app *fiber.App, handler *handler.Handler) {
 	}))
 	//app.Use(limiter.New())
 
+	apiV1 := app.Group("/api/v1")
 	/* -------------------- Auth Routes Begins -------------------- */
 	auth := apiV1.Group("/auth")
 	auth.Post("/signup", handler.SignUp)

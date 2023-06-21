@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/imtiaz246/codera_oj/models/db"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -43,4 +44,10 @@ func (u *User) CheckPassword(plain string) error {
 
 func (u *User) ExtractEmail() string {
 	return u.Email
+}
+
+func init() {
+	if err := db.MigrateModelTables(User{}); err != nil {
+		panic(err)
+	}
 }

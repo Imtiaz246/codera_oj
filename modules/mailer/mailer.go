@@ -2,7 +2,7 @@ package mailer
 
 import (
 	"fmt"
-	"github.com/imtiaz246/codera_oj/initializers/config"
+	"github.com/imtiaz246/codera_oj/custom/config"
 	"github.com/imtiaz246/codera_oj/models"
 	"github.com/jordan-wright/email"
 	"net/smtp"

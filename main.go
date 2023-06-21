@@ -6,11 +6,11 @@ package main
 import (
 	"github.com/imtiaz246/codera_oj/cmd"
 	_ "github.com/imtiaz246/codera_oj/docs"
-	"github.com/imtiaz246/codera_oj/initializers"
+	"github.com/imtiaz246/codera_oj/setting"
 )
 
 func init() {
-	err := initializers.Initialize()
+	err := setting.Initialize()
 	if err != nil {
 		panic(err)
 	}

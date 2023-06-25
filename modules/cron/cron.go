@@ -1,6 +1,7 @@
 package cron
 
 import (
+	"fmt"
 	"reflect"
 	"time"
 )
@@ -51,11 +52,30 @@ type Signal struct {
 
 	// returnValue holds the return value from the taskFunc
 	// after the successful execution
-	returnValue []reflect.Value
+	returnValues []reflect.Value
 }
 
 func NewCron() *Cron {
 	return &Cron{
 		totExecNo: -1,
 	}
+}
+
+func (c *Cron) Every(dur time.Duration) *Cron {
+	c.interval = dur
+	return c
+}
+
+func (c *Cron) StartsAt(t time.Time) *Cron {
+	c.startsAt = t
+	return c
+}
+
+func (c *Cron) Do(taskFunc interface{}) (<-chan Signal, error) {
+	if reflect.ValueOf(taskFunc).Kind() != reflect.Func {
+		return nil, fmt.Errorf("task type has to be a function")
+	}
+	// todo: handle logic and run the task function
+
+	return c.signalChan, nil
 }

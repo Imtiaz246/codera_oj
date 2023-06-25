@@ -48,12 +48,11 @@ func (c *Cache[VT]) Set(key string, value VT) error {
 	c.lock()
 	defer c.unlock()
 
-	for i := 0; i < 3; i++ {
-		c.data[key] = value
-		if _, ok := c.data[key]; ok {
-			return nil
-		}
+	c.data[key] = value
+	if _, ok := c.data[key]; ok {
+		return nil
 	}
+
 	return fmt.Errorf("internal server problem. Key has not been saved")
 }
 

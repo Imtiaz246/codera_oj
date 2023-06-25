@@ -6,12 +6,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	apiv1 "github.com/imtiaz246/codera_oj/app/api/v1"
-	"github.com/imtiaz246/codera_oj/initializers/config"
-	"github.com/imtiaz246/codera_oj/initializers/session_cache"
-	models2 "github.com/imtiaz246/codera_oj/models"
-	"github.com/imtiaz246/codera_oj/services/mailer"
-	"github.com/imtiaz246/codera_oj/services/token"
-	"github.com/imtiaz246/codera_oj/store"
+	"github.com/imtiaz246/codera_oj/custom/config"
+	"github.com/imtiaz246/codera_oj/models"
+	"github.com/imtiaz246/codera_oj/modules/mailer"
+	"github.com/imtiaz246/codera_oj/modules/token"
 	"github.com/imtiaz246/codera_oj/utils"
 	"github.com/o1egl/paseto"
 	"net/http"
@@ -33,7 +31,7 @@ var (
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Router /auth/signup [post]
-func (h *Handler) SignUp(ctx *fiber.Ctx) error {
+func SignUp(ctx *fiber.Ctx) error {
 	req := new(apiv1.UserRegisterRequest)
 	if err := BindAndValidate(ctx, req); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
@@ -43,17 +41,16 @@ func (h *Handler) SignUp(ctx *fiber.Ctx) error {
 	if err := u.HashPassword(); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
-
-	if err := h.UserStore.GetUserByUsernameOrEmail(u.Username, ve.Email, u); err == nil {
+	if err := models.GetUserByUsernameOrEmail(u.Username, ve.Email, u); err == nil {
 		return ctx.Status(http.StatusNotAcceptable).JSON(utils.DuplicateEntry())
 	}
-	if err := h.UserStore.Create(u); err != nil {
+	if err := models.CreateRecord[*models.User](u); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 	if err := ve.FillEmailVerifierInfo(u); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
-	if err := h.VerifyEmailStore.Create(ve); err != nil {
+	if err := models.CreateRecord[*models.VerifyEmail](ve); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 	if err := sendEmailVerificationMail(ve); err != nil {
@@ -73,14 +70,14 @@ func (h *Handler) SignUp(ctx *fiber.Ctx) error {
 // @Produce json
 // @Success 200 {object} apiv1.UserLoginResponse
 // @Router /auth/login [post]
-func (h *Handler) Login(ctx *fiber.Ctx) error {
+func Login(ctx *fiber.Ctx) error {
 	req := new(apiv1.UserLoginRequest)
 	if err := BindAndValidate(ctx, req); err != nil {
 		return ctx.Status(http.StatusNotAcceptable).JSON(utils.NewError(err))
 	}
 
-	u := new(models2.User)
-	if err := h.UserStore.GetUserByUsernameOrEmail(req.Username, req.Email, u); err != nil {
+	u := new(models.User)
+	if err := models.GetUserByUsernameOrEmail(req.Username, req.Email, u); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
 	}
 
@@ -97,14 +94,14 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
-	session, err := createSessionFromTokenInfo(refreshTokenInfo, h.UserStore)
+	session, err := createSessionFromTokenInfo(refreshTokenInfo)
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
-	if err := session_cache.Set(session.ID.String(), session); err != nil {
+	if err := models.SessionCache.Set(session.ID.String(), *session); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
-	if err := h.SessionStore.Create(session); err != nil {
+	if err := models.CreateRecord[*models.Session](session); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 
@@ -122,17 +119,17 @@ func (h *Handler) Login(ctx *fiber.Ctx) error {
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Router /auth/verify-email/{id}/{token} [get]
-func (h *Handler) VerifyEmail(ctx *fiber.Ctx) error {
-	ve := new(models2.VerifyEmail)
+func VerifyEmail(ctx *fiber.Ctx) error {
+	ve := new(models.VerifyEmail)
 
-	if err := h.VerifyEmailStore.GetIDToken(ctx.Params("id"), ctx.Params("token"), ve); err != nil {
+	if err := models.GetVerifyEmailUsingIDToken(ctx.Params("id"), ctx.Params("token"), ve); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 	if err := ve.IsLinkExpired(); err != nil {
 		return ctx.Status(http.StatusNotAcceptable).JSON(utils.NewError(err))
 	}
 	u := ve.VerifiedUser()
-	if err := h.UserStore.UpdateUser(u); err != nil {
+	if err := models.UpdateRecord[*models.User](u); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 
@@ -150,7 +147,7 @@ func (h *Handler) VerifyEmail(ctx *fiber.Ctx) error {
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Router /auth/{username}/renew-token [get]
-func (h *Handler) RenewToken(ctx *fiber.Ctx) error {
+func RenewToken(ctx *fiber.Ctx) error {
 	refreshToken := ctx.Query("refresh-token")
 	pasetoPayload, err := getPasetoJsonPayload(refreshToken)
 	if err != nil {
@@ -165,14 +162,14 @@ func (h *Handler) RenewToken(ctx *fiber.Ctx) error {
 	tokenID := pasetoPayload.Jti
 
 	// Get the session from session_cache or database
-	session := new(models2.Sessions)
-	session, err = session_cache.Get(tokenID)
+	session, err := models.SessionCache.Get(tokenID)
 	if err != nil {
-		if err := h.SessionStore.GetBySessionID(tokenID, session); err != nil {
+		session, err = models.GetRecordByID[*models.Session](tokenID)
+		if err != nil {
 			return ctx.Status(http.StatusNotAcceptable).JSON(utils.NewError(ErrTokenIsNotValid))
 		}
 
-		if err := session_cache.Set(tokenID, session); err != nil {
+		if err := models.SessionCache.Set(tokenID, *session); err != nil {
 			return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 		}
 	}
@@ -183,10 +180,10 @@ func (h *Handler) RenewToken(ctx *fiber.Ctx) error {
 	// Check for token corruption
 	if ctx.IP() != claimsInfo.ClientIP || ctx.GetReqHeaders()["User-Agent"] != claimsInfo.UserAgent {
 		session.IsBlocked = true
-		if err := session_cache.Set(session.ID.String(), session); err != nil {
+		if err := models.SessionCache.Set(session.ID.String(), *session); err != nil {
 			return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 		}
-		if err := h.SessionStore.UpdateSession(session); err != nil {
+		if err := models.UpdateRecord[*models.Session](session); err != nil {
 			return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 		}
 		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(ErrTokenIsBlocked))
@@ -197,8 +194,8 @@ func (h *Handler) RenewToken(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 
-	user := new(models2.User)
-	if err := h.UserStore.GetUserByUsername(claimsInfo.Username, user); err != nil {
+	user := new(models.User)
+	if err := models.GetUserByUsername(claimsInfo.Username, user); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 
@@ -206,12 +203,12 @@ func (h *Handler) RenewToken(ctx *fiber.Ctx) error {
 }
 
 // extractRegistrationRequest extracts information for user registration request
-func extractRegistrationRequest(r *apiv1.UserRegisterRequest) (*models2.User, *models2.VerifyEmail) {
-	u := &models2.User{
+func extractRegistrationRequest(r *apiv1.UserRegisterRequest) (*models.User, *models.VerifyEmail) {
+	u := &models.User{
 		Username: r.Username,
 		Password: r.Password,
 	}
-	ve := &models2.VerifyEmail{
+	ve := &models.VerifyEmail{
 		Email: r.Email,
 	}
 
@@ -219,7 +216,7 @@ func extractRegistrationRequest(r *apiv1.UserRegisterRequest) (*models2.User, *m
 }
 
 // sendEmailVerificationMail sends email verification mail to user
-func sendEmailVerificationMail(ve *models2.VerifyEmail) error {
+func sendEmailVerificationMail(ve *models.VerifyEmail) error {
 	return mailer.NewMailer().
 		To([]string{ve.ExtractEmail()}).
 		WithSubject("Codera OJ Email Verification").
@@ -228,7 +225,7 @@ func sendEmailVerificationMail(ve *models2.VerifyEmail) error {
 }
 
 // getTokenManager get the token manager
-func getTokenManager(authConfig *config.AuthConfig) (token.TokenManager, error) {
+func getTokenManager(authConfig config.AuthConfig) (token.TokenManager, error) {
 	key, err := base64.StdEncoding.DecodeString(authConfig.Key)
 	if err != nil {
 		return nil, err
@@ -242,7 +239,7 @@ func getTokenManager(authConfig *config.AuthConfig) (token.TokenManager, error) 
 
 // getTokens returns access token and refresh token for a valid user
 func getTokens(claimsInfo *token.ClaimsInfo) (accessTokenInfo, refreshTokenInfo *token.TokenInfo, err error) {
-	authConfig := config.GetAuthConfig()
+	authConfig := config.Settings.Auth
 	tokenManager, err := getTokenManager(authConfig)
 	if err != nil {
 		return
@@ -271,7 +268,7 @@ func getTokens(claimsInfo *token.ClaimsInfo) (accessTokenInfo, refreshTokenInfo 
 
 // getAccessToken get the access token with claims and returns the TokenInfo
 func getAccessToken(claimsInfo *token.ClaimsInfo) (accessTokenInfo *token.TokenInfo, err error) {
-	authConfig := config.GetAuthConfig()
+	authConfig := config.Settings.Auth
 	tokenManager, err := getTokenManager(authConfig)
 	if err != nil {
 		return
@@ -291,7 +288,7 @@ func getAccessToken(claimsInfo *token.ClaimsInfo) (accessTokenInfo *token.TokenI
 
 // getTokenPayload verifies the token and returns the paseto json payload
 func getPasetoJsonPayload(tokenStr string) (*paseto.JSONToken, error) {
-	authConfig := config.GetAuthConfig()
+	authConfig := config.Settings.Auth
 	key, err := base64.StdEncoding.DecodeString(authConfig.Key)
 	if err != nil {
 		return nil, err
@@ -310,16 +307,16 @@ func getPasetoJsonPayload(tokenStr string) (*paseto.JSONToken, error) {
 }
 
 // createSessionFromTokenInfo creates session from token info
-func createSessionFromTokenInfo(tokenInfo *token.TokenInfo, userStore *store.UserStore) (*models2.Sessions, error) {
+func createSessionFromTokenInfo(tokenInfo *token.TokenInfo) (*models.Session, error) {
 	tokenUUID, err := uuid.Parse(tokenInfo.Payload.Jti)
 	if err != nil {
 		return nil, err
 	}
-	user := new(models2.User)
-	if err := userStore.GetUserByUsername(tokenInfo.Payload.Get("username"), user); err != nil {
+	user := new(models.User)
+	if err := models.GetUserByUsername(tokenInfo.Payload.Get("username"), user); err != nil {
 		return nil, err
 	}
-	session := &models2.Sessions{
+	session := &models.Session{
 		ID:        tokenUUID,
 		User:      user,
 		UserId:    user.ID,

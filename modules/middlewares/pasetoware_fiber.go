@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"github.com/imtiaz246/codera_oj/initializers/config"
+	"github.com/imtiaz246/codera_oj/custom/config"
 	"github.com/o1egl/paseto"
 	"strings"
 	"time"
@@ -21,7 +21,7 @@ type Config struct {
 
 // NewPasetoDefaultConfig returns default configuration for the token middleware
 func NewPasetoDefaultConfig() *Config {
-	authConfig := config.GetAuthConfig()
+	authConfig := config.Settings.Auth
 	return &Config{
 		TokenLookup:  fmt.Sprintf("header:%s,cookie:token", fiber.HeaderAuthorization),
 		ContextKey:   "payload",

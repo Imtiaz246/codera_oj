@@ -2,5 +2,7 @@ tmp
 .idea
 practise.go
 gorm.sqlite
-initializers/config/app.ini
-initializers/config/app.yaml
+custom/config/app.ini
+custom/config/app.yaml
+fiber.sqlite3
+.vscode

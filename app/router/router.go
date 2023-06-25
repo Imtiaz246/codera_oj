@@ -5,7 +5,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
-	"github.com/imtiaz246/codera_oj/app/handler"
 	"github.com/imtiaz246/codera_oj/app/router/routes"
 )
 
@@ -20,11 +19,7 @@ func New() (*fiber.App, error) {
 	}))
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
-	appHandler, err := handler.NewHandler()
-	if err != nil {
-		return nil, err
-	}
-	routes.RegisterRoutes(app, appHandler)
+	routes.RegisterRoutes(app)
 
 	return app, nil
 }

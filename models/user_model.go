@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/imtiaz246/codera_oj/models/db"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -43,4 +44,18 @@ func (u *User) CheckPassword(plain string) error {
 
 func (u *User) ExtractEmail() string {
 	return u.Email
+}
+
+func init() {
+	if err := db.MigrateModelTables(User{}); err != nil {
+		panic(err)
+	}
+}
+
+func GetUserByUsername(username string, u *User) error {
+	return db.GetEngine().Where("username = ?", username).First(u).Error
+}
+
+func GetUserByUsernameOrEmail(username, email string, u *User) error {
+	return db.GetEngine().Where("username = ?", username).Or("email = ? AND email IS NOT NULL", email).First(u).Error
 }

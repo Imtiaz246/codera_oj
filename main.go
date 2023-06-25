@@ -6,15 +6,7 @@ package main
 import (
 	"github.com/imtiaz246/codera_oj/cmd"
 	_ "github.com/imtiaz246/codera_oj/docs"
-	"github.com/imtiaz246/codera_oj/initializers"
 )
-
-func init() {
-	err := initializers.Initialize()
-	if err != nil {
-		panic(err)
-	}
-}
 
 // @title Fiber Example API
 // @version 2.0

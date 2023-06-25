@@ -4,7 +4,8 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
-	"github.com/imtiaz246/codera_oj/initializers/config"
+	"github.com/imtiaz246/codera_oj/custom/config"
+	"github.com/imtiaz246/codera_oj/models/db"
 	"gorm.io/gorm"
 	"strconv"
 	"time"
@@ -42,7 +43,7 @@ func (ve *VerifyEmail) IsLinkUsed() bool {
 }
 
 func (ve *VerifyEmail) GenerateLink() string {
-	serverConfig := config.GetServerConfig()
+	serverConfig := config.Settings.Server
 	return serverConfig.Protocol + "://" + serverConfig.Url + "/api/v1/auth/verify-email/" + strconv.FormatUint(uint64(ve.ID), 10) + "/" + ve.Token
 }
 
@@ -70,4 +71,14 @@ func (ve *VerifyEmail) FillEmailVerifierInfo(u *User) error {
 	}
 
 	return nil
+}
+
+func GetVerifyEmailUsingIDToken(id, token string, ve *VerifyEmail) error {
+	return db.GetEngine().Preload("User").Where("id = ? AND token = ?", id, token).First(ve).Error
+}
+
+func init() {
+	if err := db.MigrateModelTables(VerifyEmail{}); err != nil {
+		panic(err)
+	}
 }

@@ -21,7 +21,7 @@ var (
 // init initializes the database connection
 // and assign it to the db instance.
 func init() {
-	dbConfig := config.Cfg.Database
+	dbConfig := config.Settings.Database
 
 	switch dbConfig.DbType {
 	case "sqlite3":
@@ -41,7 +41,7 @@ func init() {
 	}
 
 	db.NamingStrategy = schema.NamingStrategy{
-		TablePrefix: "codera",
+		TablePrefix: "codera_",
 	}
 }
 

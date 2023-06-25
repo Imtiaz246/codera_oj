@@ -25,7 +25,7 @@ type Mailer interface {
 }
 
 func NewMailer() Mailer {
-	emailConfig := config.GetEmailConfig()
+	emailConfig := config.Settings.Email
 	return &mail{
 		senderName: EmailSourceName,
 		senderAddr: emailConfig.SenderEmail,

@@ -2,27 +2,37 @@ package handler
 
 import "github.com/gofiber/fiber/v2"
 
-func (h *Handler) GetProblemSet(ctx *fiber.Ctx) error {
+func GetProblemSet(ctx *fiber.Ctx) error {
 
 	return nil
 }
 
-func (h *Handler) GetProblemUsingID(ctx *fiber.Ctx) error {
+func GetProblemUsingID(ctx *fiber.Ctx) error {
 
 	return nil
 }
 
-func (h *Handler) UpdateProblemUsingID(ctx *fiber.Ctx) error {
+func UpdateProblemUsingID(ctx *fiber.Ctx) error {
 
 	return nil
 }
 
-func (h *Handler) CreateProblem(ctx *fiber.Ctx) error {
+// CreateProblem creates a problem
+// HealthCheck godoc
+// @Summary CreateProblem creates a problem.
+// @Description creates problem for the oj.
+// @Tags problem
+// @Param data body apiv1.CreateProblemOptions true "data"
+// @Accept application/json
+// @Produce json
+// @Success 200 {object} map[string]interface{}
+// @Router /problem/ [post]
+func CreateProblem(ctx *fiber.Ctx) error {
 
 	return nil
 }
 
-func (h *Handler) ShareProblem(ctx *fiber.Ctx) error {
+func ShareProblem(ctx *fiber.Ctx) error {
 
 	return nil
 }

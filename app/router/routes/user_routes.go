@@ -6,7 +6,7 @@ import (
 	"github.com/imtiaz246/codera_oj/modules/middlewares"
 )
 
-func registerUserRoutes(apiV1 fiber.Router, handler *handler.Handler) {
+func registerUserRoutes(apiV1 fiber.Router) {
 	user := apiV1.Group("/users")
 	user.Get("/:username", handler.GetUserByUsername)
 

@@ -6,7 +6,7 @@ import (
 	"github.com/imtiaz246/codera_oj/modules/middlewares"
 )
 
-func registerProblemRoutes(apiV1 fiber.Router, handler *handler.Handler) {
+func registerProblemRoutes(apiV1 fiber.Router) {
 	problemSet := apiV1.Group("/problemset")
 	problemSet.Get("/", handler.GetProblemSet)
 

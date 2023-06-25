@@ -21,7 +21,7 @@ type Config struct {
 
 // NewPasetoDefaultConfig returns default configuration for the token middleware
 func NewPasetoDefaultConfig() *Config {
-	authConfig := config.Cfg.Auth
+	authConfig := config.Settings.Auth
 	return &Config{
 		TokenLookup:  fmt.Sprintf("header:%s,cookie:token", fiber.HeaderAuthorization),
 		ContextKey:   "payload",

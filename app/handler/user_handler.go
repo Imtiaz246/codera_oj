@@ -18,9 +18,9 @@ import (
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Router /users/{username} [get]
-func (h *Handler) GetUserByUsername(c *fiber.Ctx) error {
+func GetUserByUsername(c *fiber.Ctx) error {
 	u := new(models.User)
-	if err := h.UserStore.GetUserByUsername(c.Params("username"), u); err != nil {
+	if err := models.GetUserByUsername(c.Params("username"), u); err != nil {
 		return c.Status(http.StatusNotAcceptable).JSON(utils.NewError(err))
 	}
 
@@ -38,7 +38,7 @@ func (h *Handler) GetUserByUsername(c *fiber.Ctx) error {
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Router /users/{username} [put]
-func (h *Handler) UpdateUser(c *fiber.Ctx) error {
+func UpdateUser(c *fiber.Ctx) error {
 
 	return nil
 }
@@ -54,19 +54,19 @@ func (h *Handler) UpdateUser(c *fiber.Ctx) error {
 // @Produce json
 // @Success 200 {object} map[string]interface{}
 // @Router /users/{username}/password [put]
-func (h *Handler) UpdatePassword(c *fiber.Ctx) error {
+func UpdatePassword(c *fiber.Ctx) error {
 
 	return c.Status(http.StatusOK).JSON("")
 }
 
 // GenerateForgotPasswordLink sends a reset password link to the email
-func (h *Handler) GenerateForgotPasswordLink(c *fiber.Ctx) error {
+func GenerateForgotPasswordLink(c *fiber.Ctx) error {
 
 	return nil
 }
 
 // ResetPasswordFromLink resets the password from a link
-func (h *Handler) ResetPasswordFromLink(c *fiber.Ctx) error {
+func ResetPasswordFromLink(c *fiber.Ctx) error {
 
 	return nil
 }

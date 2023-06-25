@@ -9,45 +9,45 @@ import (
 var (
 	//go:embed app.yaml
 	ConfigFS []byte
-	Cfg      AppSettings
+	Settings AppSettings
 )
 
 func init() {
-	if err := yaml.Unmarshal(ConfigFS, &Cfg); err != nil {
+	if err := yaml.Unmarshal(ConfigFS, &Settings); err != nil {
 		panic(fmt.Errorf("setting init error: `%v`", err))
 	}
 }
 
 type AppSettings struct {
-	App      appConfig      `yaml:"app"`
-	Server   serverConfig   `yaml:"server"`
-	Database databaseConfig `yaml:"database"`
-	Auth     authConfig     `yaml:"auth"`
-	Email    emailConfig    `yaml:"email"`
+	App      AppConfig      `yaml:"app"`
+	Server   ServerConfig   `yaml:"server"`
+	Database DatabaseConfig `yaml:"database"`
+	Auth     AuthConfig     `yaml:"auth"`
+	Email    EmailConfig    `yaml:"email"`
 }
 
-type authConfig struct {
+type AuthConfig struct {
 	Key                  string `yaml:"PASETO_SYMMETRIC_KEY"`
 	AccessTokenDuration  string `yaml:"ACCESS_TOKEN_DURATION"`
 	RefreshTokenDuration string `yaml:"REFRESH_TOKEN_DURATION"`
 }
 
-type appConfig struct {
+type AppConfig struct {
 	AppName string `yaml:"APP_NAME"`
 	RunMode string `yaml:"RUN_MODE"`
 }
 
-type serverConfig struct {
+type ServerConfig struct {
 	Protocol string `yaml:"PROTOCOL"`
 	Url      string `yaml:"URL"`
 }
 
-type emailConfig struct {
+type EmailConfig struct {
 	SenderEmail string `yaml:"SENDER_EMAIL"`
 	SenderPass  string `yaml:"SENDER_PASSWORD"`
 }
 
-type databaseConfig struct {
+type DatabaseConfig struct {
 	DbType   string `yaml:"DB_TYPE"`
 	Name     string `yaml:"NAME"`
 	Host     string `yaml:"HOST"`

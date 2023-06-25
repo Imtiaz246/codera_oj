@@ -5,7 +5,7 @@ import (
 	"github.com/imtiaz246/codera_oj/app/handler"
 )
 
-func registerAuthRoutes(apiV1 fiber.Router, handler *handler.Handler) {
+func registerAuthRoutes(apiV1 fiber.Router) {
 	auth := apiV1.Group("/auth")
 	auth.Post("/signup", handler.SignUp)
 	auth.Post("/login", handler.Login)

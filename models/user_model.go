@@ -51,3 +51,11 @@ func init() {
 		panic(err)
 	}
 }
+
+func GetUserByUsername(username string, u *User) error {
+	return db.GetEngine().Where("username = ?", username).First(u).Error
+}
+
+func GetUserByUsernameOrEmail(username, email string, u *User) error {
+	return db.GetEngine().Where("username = ?", username).Or("email = ? AND email IS NOT NULL", email).First(u).Error
+}

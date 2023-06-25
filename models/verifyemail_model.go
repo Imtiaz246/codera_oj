@@ -43,7 +43,7 @@ func (ve *VerifyEmail) IsLinkUsed() bool {
 }
 
 func (ve *VerifyEmail) GenerateLink() string {
-	serverConfig := config.Cfg.Server
+	serverConfig := config.Settings.Server
 	return serverConfig.Protocol + "://" + serverConfig.Url + "/api/v1/auth/verify-email/" + strconv.FormatUint(uint64(ve.ID), 10) + "/" + ve.Token
 }
 

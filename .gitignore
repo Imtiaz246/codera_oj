@@ -5,3 +5,4 @@ gorm.sqlite
 custom/config/app.ini
 custom/config/app.yaml
 fiber.sqlite3
+.vscode

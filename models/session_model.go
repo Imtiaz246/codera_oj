@@ -21,7 +21,7 @@ type Session struct {
 	DeletedAt time.Time `gorm:"index;default:null"`
 }
 
-var SessionCache *cache.Cache
+var SessionCache *cache.Cache[Session]
 
 func init() {
 	if err := db.MigrateModelTables(Session{}); err != nil {
@@ -29,15 +29,15 @@ func init() {
 	}
 
 	// Initialize session cache
-	SessionCache = cache.NewCache()
+	SessionCache = cache.NewCache[Session]()
 
-	sessionRecords, err := db.GetAllRecords[Session]()
+	sessionRecords, err := GetAllRecords[*Session]()
 	if err != nil {
 		panic(err)
 	}
 
 	for _, sessionRecord := range sessionRecords {
-		if err = SessionCache.Set(sessionRecord.ID, sessionRecord); err != nil {
+		if err = SessionCache.Set(sessionRecord.ID.String(), *sessionRecord); err != nil {
 			panic(err)
 		}
 	}

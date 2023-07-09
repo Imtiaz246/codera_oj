@@ -1,9 +1,12 @@
 package models
 
 import (
+	"context"
 	"github.com/google/uuid"
 	"github.com/imtiaz246/codera_oj/models/db"
 	"github.com/imtiaz246/codera_oj/modules/cache"
+	"github.com/imtiaz246/codera_oj/modules/cronera"
+	"log"
 	"time"
 )
 
@@ -21,15 +24,12 @@ type Session struct {
 	DeletedAt time.Time `gorm:"index;default:null"`
 }
 
-var SessionCache *cache.Cache[Session]
+var SessionCache = cache.NewCache[Session]()
 
 func init() {
 	if err := db.MigrateModelTables(Session{}); err != nil {
 		panic(err)
 	}
-
-	// Initialize session cache
-	SessionCache = cache.NewCache[Session]()
 
 	sessionRecords, err := GetAllRecords[*Session]()
 	if err != nil {
@@ -41,6 +41,26 @@ func init() {
 			panic(err)
 		}
 	}
+	_, err = cronera.New().Every(1).Day().At("03:00").Do(context.Background(), expiredSessionRemover)
+	if err != nil {
+		panic(err)
+	}
+}
 
-	// todo: add expired session remover cron job
+func expiredSessionRemover() {
+	log.Println("removing expired session started")
+	sessionRecords, err := GetAllRecords[*Session]()
+	if err != nil {
+		log.Println("session record getting error: ", err)
+		return
+	}
+
+	for _, sessionRecord := range sessionRecords {
+		if sessionRecord.ExpiresAt.Before(time.Now()) || sessionRecord.IsBlocked {
+			if err = DeleteRecord[*Session](sessionRecord); err != nil {
+				log.Println("expired session deletion error: ", err)
+			}
+			SessionCache.Remove(sessionRecord.ID.String())
+		}
+	}
 }

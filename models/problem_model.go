@@ -24,8 +24,7 @@ type Problem struct {
 	OutputStatement                  string
 	NoteStatement                    string
 	IsStatementsVisibleDuringContest bool
-	TagsID                           uint
-	Tags                             Tags
+	ProblemTags                      []ProblemTag
 	ProblemVisibilityState           uint `gorm:"default:0"`
 }
 

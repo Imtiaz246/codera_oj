@@ -9,8 +9,9 @@ type ST interface {
 		*Session |
 		*Problem |
 		*Contest |
-		*Tags |
-		*VerifyEmail
+		*Tag |
+		*VerifyEmail |
+		*ProblemTag
 }
 
 func GetAllRecords[T ST]() ([]T, error) {

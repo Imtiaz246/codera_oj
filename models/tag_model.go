@@ -5,13 +5,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type Tags struct {
+type Tag struct {
 	gorm.Model
 	name string
 }
 
 func init() {
-	if err := db.MigrateModelTables(Tags{}); err != nil {
+	if err := db.MigrateModelTables(Tag{}); err != nil {
 		panic(err)
 	}
 }

@@ -5,12 +5,18 @@ import (
 	"gorm.io/gorm"
 )
 
+type CheckerType int
+
 const (
-	CheckerTypeDefault = iota
-	CheckerTypeString
-	CheckerTypeFloat
-	CheckerTypeSpecial
+	Default CheckerType = iota
+	String
+	Float
+	Special
 )
+
+func (i CheckerType) String() string {
+	return [...]string{"Default", "String", "Float", "Special"}[i-1]
+}
 
 type Problem struct {
 	gorm.Model
@@ -31,8 +37,9 @@ type Problem struct {
 	Tags     []ProblemTag
 	Datasets []Dataset
 
-	CheckerType          uint `gorm:"default:0"`
-	IsProblemPublishable bool `gorm:"default:false"`
+	IsProblemPublishable bool        `gorm:"default:false"`
+	IsProblemPublished   bool        `gorm:"default:false"`
+	CheckerType          CheckerType `gorm:"default:0"`
 	SharedWith           []ProblemShare
 	ChangeLogs           []ProblemChangeLog
 	Discussions          []ProblemDiscussion

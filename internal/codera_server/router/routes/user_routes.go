@@ -3,7 +3,7 @@ package routes
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/imtiaz246/codera_oj/internal/codera_server/handler"
-	"github.com/imtiaz246/codera_oj/modules/middlewares"
+	"github.com/imtiaz246/codera_oj/middlewares"
 )
 
 func registerUserRoutes(apiV1 fiber.Router) {

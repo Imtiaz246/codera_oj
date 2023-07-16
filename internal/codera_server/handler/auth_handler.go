@@ -41,7 +41,7 @@ func SignUp(ctx *fiber.Ctx) error {
 	if err := u.HashPassword(); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
-	if err := models.GetUserByUsernameOrEmail(u.Handle, ve.Email, u); err == nil {
+	if err := models.GetUserByUsernameOrEmail(u.Username, ve.Email, u); err == nil {
 		return ctx.Status(http.StatusNotAcceptable).JSON(utils.DuplicateEntry())
 	}
 	if err := models.CreateRecord[*models.User](u); err != nil {
@@ -86,7 +86,7 @@ func Login(ctx *fiber.Ctx) error {
 	}
 
 	newClaimsInfo := &token.ClaimsInfo{
-		Username:  u.Handle,
+		Username:  u.Username,
 		ClientIP:  ctx.IP(),
 		UserAgent: ctx.GetReqHeaders()["User-Agent"],
 	}
@@ -205,7 +205,7 @@ func RenewToken(ctx *fiber.Ctx) error {
 // extractRegistrationRequest extracts information for user registration request
 func extractRegistrationRequest(r *apiv1.UserRegisterRequest) (*models.User, *models.VerifyEmail) {
 	u := &models.User{
-		Handle:   r.Username,
+		Username: r.Username,
 		Password: r.Password,
 	}
 	ve := &models.VerifyEmail{

@@ -7,7 +7,7 @@ import (
 )
 
 const htmlTemplate = `
-<h3>Hello {{ .Handle }}.</h3> <br>
+<h3>Hello {{ .Username }}.</h3> <br>
 Thanks for registering with us! <br>
 Please <a href={{ .Link }}>click here</a> to verify your email address before {{ .ExpirationTime }}. <br>
 `
@@ -23,7 +23,7 @@ type templateData struct {
 func fillTemplateData(data interface{}) *templateData {
 	ve := data.(*models.VerifyEmail)
 	d := &templateData{
-		Username:       ve.User.Handle,
+		Username:       ve.User.Username,
 		Link:           ve.GenerateLink(),
 		ExpirationTime: ve.ExpirationTime.Format("2006-01-02 03:04:05 pm"),
 	}

@@ -14,7 +14,7 @@ const (
 
 type User struct {
 	gorm.Model
-	Handle           string `gorm:"uniqueIndex;not null"`
+	Username         string `gorm:"uniqueIndex;not null"`
 	Email            string `gorm:"uniqueIndex,omitempty;default:null"`
 	KeepEmailPrivate bool   `gorm:"default:1"`
 	Password         string `gorm:"not null"`

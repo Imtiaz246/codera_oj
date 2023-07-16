@@ -53,7 +53,7 @@ type RenewTokenResponse struct {
 
 type UserResponse struct {
 	ID           uint   `json:"id"`
-	Handle       string `json:"handle"`
+	Username     string `json:"username"`
 	Email        string `json:"email"`
 	DisplayName  string `json:"displayName"`
 	Organization string `json:"organization"`
@@ -68,7 +68,7 @@ func NewUserResponse(u *models.User) *UserResponse {
 		City:         u.City,
 		Image:        u.Image,
 		Country:      u.Country,
-		Handle:       u.Handle,
+		Username:     u.Username,
 		DisplayName:  u.DisplayName,
 		Organization: u.Organization,
 	}

@@ -1,6 +1,12 @@
 package handler
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"fmt"
+	"github.com/gofiber/fiber/v2"
+	apiv1 "github.com/imtiaz246/codera_oj/internal/codera_server/api/v1"
+	"github.com/imtiaz246/codera_oj/utils"
+	"net/http"
+)
 
 func GetProblemSet(ctx *fiber.Ctx) error {
 
@@ -28,6 +34,13 @@ func UpdateProblemUsingID(ctx *fiber.Ctx) error {
 // @Success 200 {object} map[string]interface{}
 // @Router /problem/ [post]
 func CreateProblem(ctx *fiber.Ctx) error {
+	req := new(apiv1.CreateProblemOption)
+	if err := BindAndValidate(ctx, req); err != nil {
+		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
+	}
+
+	pasetoPayload := ctx.Locals("payload")
+	fmt.Println(pasetoPayload)
 
 	return nil
 }

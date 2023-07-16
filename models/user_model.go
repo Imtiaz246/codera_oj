@@ -14,15 +14,14 @@ const (
 
 type User struct {
 	gorm.Model
-	Username         string `gorm:"uniqueIndex;not null"`
+	Handle           string `gorm:"uniqueIndex;not null"`
 	Email            string `gorm:"uniqueIndex,omitempty;default:null"`
 	KeepEmailPrivate bool   `gorm:"default:1"`
 	Password         string `gorm:"not null"`
 	Role             uint   `gorm:"default:2"`
 	Verified         bool   `gorm:"default:0"`
 
-	FirstName    string
-	LastName     string
+	DisplayName  string
 	Organization string
 	Country      string
 	City         string

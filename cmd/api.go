@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/imtiaz246/codera_oj/app/router"
+	"github.com/imtiaz246/codera_oj/internal/codera_server/router"
 	"github.com/spf13/cobra"
 	"log"
 )

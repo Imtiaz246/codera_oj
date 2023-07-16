@@ -12,7 +12,7 @@ import (
 
 type Session struct {
 	ID        uuid.UUID `gorm:"primarykey"`
-	UserId    uint
+	UserID    uint
 	User      *User
 	UserAgent string
 	IsBlocked bool `gorm:"default:0"`

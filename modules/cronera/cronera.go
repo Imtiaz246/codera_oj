@@ -77,8 +77,8 @@ func (c *Cronera) Do(ctx context.Context, taskFunc any, args ...any) (<-chan *Si
 		if err != nil {
 			return nil, err
 		}
-		if date.Before(time.Now()) {
-			return nil, fmt.Errorf("startDate is before current time")
+		if date.Before(truncateToStartOfDay(time.Now())) {
+			return nil, fmt.Errorf("startDate is before current date")
 		}
 		nextRunningDate = date
 	} else {
@@ -92,16 +92,17 @@ func (c *Cronera) Do(ctx context.Context, taskFunc any, args ...any) (<-chan *Si
 			todayDate := <-waitUntil(nextRunningDate)
 			todayTimes := parseTodayTimes(c.at, todayDate)
 			for _, t := range todayTimes {
-				if time.Now().After(t) {
+				if time.Now().Sub(t) > time.Second*1 {
 					continue
 				}
 				select {
 				case <-waitUntil(t):
 					serialNo++
-					out := execTaskFunc(taskFunc, args...)
-					dropSignalIfFull(signalStream)
-					signalStream <- newSignalWithOptions(t, serialNo, min(c.totExecNo, c.totExecNo-serialNo), StatusTaskSuccessful, out)
-
+					go func() {
+						out := execTaskFunc(taskFunc, args...)
+						dropSignalIfFull(signalStream)
+						signalStream <- newSignalWithOptions(t, serialNo, min(c.totExecNo, c.totExecNo-serialNo), StatusTaskSuccessful, out)
+					}()
 					if serialNo == c.totExecNo {
 						return
 					}

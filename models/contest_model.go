@@ -7,6 +7,7 @@ import (
 
 type Contest struct {
 	gorm.Model
+	// todo: complete
 }
 
 func init() {

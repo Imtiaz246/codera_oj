@@ -7,7 +7,9 @@ import (
 
 type Tag struct {
 	gorm.Model
-	name string
+	TagName string
+	AddedBy uint
+	User    *User `gorm:"foreignKey:AddedBy"`
 }
 
 func init() {

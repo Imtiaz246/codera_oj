@@ -11,7 +11,12 @@ type ST interface {
 		*Contest |
 		*Tag |
 		*VerifyEmail |
-		*ProblemTag
+		*ProblemTag |
+		*Dataset |
+		*ProblemShare |
+		*ProblemChangeLog |
+		*ProblemSolution |
+		*ProblemDiscussion
 }
 
 func GetAllRecords[T ST]() ([]T, error) {

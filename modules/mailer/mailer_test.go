@@ -9,8 +9,8 @@ import (
 
 func TestMailer(t *testing.T) {
 	user := models.User{
-		Username: "imtiaz_email_test",
-		Email:    "imtiazuddincho246@gmail.com",
+		Handle: "imtiaz_email_test",
+		Email:  "imtiazuddincho246@gmail.com",
 	}
 	evm := models.VerifyEmail{
 		Email:          "imtiazuddincho246@gmail.com",

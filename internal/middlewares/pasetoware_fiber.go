@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-// Config indicates the configuration of the token middleware
-type Config struct {
+// PasetoConfig indicates the configuration of the token middleware
+type PasetoConfig struct {
 	TokenLookup  string
 	ContextKey   string
 	Filter       func(ctx *fiber.Ctx) bool
@@ -20,9 +20,9 @@ type Config struct {
 }
 
 // NewPasetoDefaultConfig returns default configuration for the token middleware
-func NewPasetoDefaultConfig() *Config {
+func newPasetoDefaultConfig() *PasetoConfig {
 	authConfig := config.Settings.Auth
-	return &Config{
+	return &PasetoConfig{
 		TokenLookup:  fmt.Sprintf("header:%s,cookie:token", fiber.HeaderAuthorization),
 		ContextKey:   "payload",
 		Filter:       nil,
@@ -31,13 +31,19 @@ func NewPasetoDefaultConfig() *Config {
 	}
 }
 
-// New returns the fiber middleware handler
-func New(config *Config) fiber.Handler {
-	tokenExtractor := createTokenExtractor(config.TokenLookup, config.AuthScheme)
+// NewPasetoMiddleware returns a paseto fiber middleware handler
+func NewPasetoMiddleware(configs ...*PasetoConfig) fiber.Handler {
+	var c *PasetoConfig
+	if len(configs) == 0 {
+		c = newPasetoDefaultConfig()
+	} else {
+		c = configs[0]
+	}
+	tokenExtractor := createTokenExtractor(c.TokenLookup, c.AuthScheme)
 	decryptor := paseto.NewV2()
 
 	return func(ctx *fiber.Ctx) error {
-		if config.Filter != nil && !config.Filter(ctx) {
+		if c.Filter != nil && !c.Filter(ctx) {
 			return ctx.Next()
 		}
 		token := tokenExtractor(ctx)
@@ -46,7 +52,7 @@ func New(config *Config) fiber.Handler {
 		}
 
 		pasetoPayload := new(paseto.JSONToken)
-		key, err := base64.StdEncoding.DecodeString(config.SymmetricKey)
+		key, err := base64.StdEncoding.DecodeString(c.SymmetricKey)
 		if err != nil {
 			return fmt.Errorf("token decoding failed: %v", err)
 		}
@@ -60,7 +66,7 @@ func New(config *Config) fiber.Handler {
 			return fmt.Errorf("token has expired, expired time is: %v", pasetoPayload.Expiration)
 		}
 
-		ctx.Locals(config.ContextKey, pasetoPayload)
+		ctx.Locals(c.ContextKey, pasetoPayload)
 
 		return ctx.Next()
 	}

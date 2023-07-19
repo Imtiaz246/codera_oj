@@ -3,17 +3,13 @@ package models
 import (
 	"github.com/imtiaz246/codera_oj/models/db"
 	"gorm.io/gorm"
-	"time"
 )
 
-type ProblemSolution struct {
+type ProblemSpecialChecker struct {
 	gorm.Model
-	Code         string
-	LanguageID   uint
-	Language     *Language
-	LastExecuted time.Time
-	TimeTaken    float32
-	MemoryTaken  float64
+	Code       string
+	LanguageID uint
+	Language   *Language
 
 	UserID        uint
 	User          *User
@@ -23,7 +19,7 @@ type ProblemSolution struct {
 }
 
 func init() {
-	if err := db.MigrateModelTables(ProblemSolution{}); err != nil {
+	if err := db.MigrateModelTables(ProblemSpecialChecker{}); err != nil {
 		panic(err)
 	}
 }

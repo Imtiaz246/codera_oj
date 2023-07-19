@@ -8,8 +8,8 @@ import (
 type Tag struct {
 	gorm.Model
 	TagName string
-	AddedBy uint
-	User    *User `gorm:"foreignKey:AddedBy"`
+	UserID  uint
+	AddedBy *User `gorm:"foreignKey:UserID"`
 }
 
 func init() {

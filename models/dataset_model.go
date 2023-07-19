@@ -14,11 +14,11 @@ type Dataset struct {
 	Input  []byte
 	Output []byte
 
-	AddedBy       uint
-	User          *User `gorm:"foreignKey:AddedBy"`
+	UserID        uint
+	AddedBy       *User `gorm:"foreignKey:UserID"`
 	ProblemID     uint
 	Problem       *Problem
-	OwnerShipType OwnershipType
+	OwnerShipType PermitType
 }
 
 func init() {

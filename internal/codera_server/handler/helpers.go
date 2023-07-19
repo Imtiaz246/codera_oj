@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"github.com/imtiaz246/codera_oj/models"
 )
 
 var v *validator.Validate
@@ -36,4 +37,14 @@ func BindAndValidate(ctx *fiber.Ctx, d any) error {
 		return err
 	}
 	return nil
+}
+
+// GetUserFromCtx extracts requested user from ctx and returns it
+func GetUserFromCtx(ctx *fiber.Ctx) (*models.User, error) {
+	user := ctx.Locals("user").(*models.User)
+	if user == nil {
+		return nil, fmt.Errorf("user from context not found")
+	}
+
+	return user, nil
 }

@@ -5,26 +5,22 @@ import (
 	"gorm.io/gorm"
 )
 
-type CheckerType int
+type CheckerType string
 
 const (
-	Default CheckerType = iota
-	String
-	Float
-	Special
+	Default CheckerType = "Default"
+	String  CheckerType = "String"
+	Float   CheckerType = "Float"
+	Special CheckerType = "Special"
 )
-
-func (i CheckerType) String() string {
-	return [...]string{"Default", "String", "Float", "Special"}[i-1]
-}
 
 type Problem struct {
 	gorm.Model
-	UserID    uint
-	User      *User
-	ContestID uint
-	Contest   *Contest
-	Title     string
+	AuthorID  uint
+	Author    *User    `gorm:"required;foreignKey:AuthorID" json:"-"`
+	ContestID *uint    `json:"contest_id,omitempty"`
+	Contest   *Contest `json:"-"`
+	Title     string   `gorm:"Index;not null;type:varchar(55)"`
 
 	TimeLimit                         float64
 	MemoryLimit                       float64
@@ -34,12 +30,13 @@ type Problem struct {
 	NoteStatement                     string
 	StatementsVisibilityDuringContest bool
 
-	Tags     []ProblemTag
-	Datasets []Dataset
+	Tags      []ProblemTag
+	Datasets  []Dataset
+	Solutions []ProblemSolution
 
 	IsProblemPublishable bool        `gorm:"default:false"`
 	IsProblemPublished   bool        `gorm:"default:false"`
-	CheckerType          CheckerType `gorm:"default:0"`
+	CheckerType          CheckerType `gorm:"default:Default"`
 	SharedWith           []ProblemShare
 	ChangeLogs           []ProblemChangeLog
 	Discussions          []ProblemDiscussion

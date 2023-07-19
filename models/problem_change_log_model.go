@@ -15,7 +15,7 @@ type ProblemChangeLog struct {
 	ProblemID uint
 	Problem   *Problem
 
-	OwnerShipType OwnershipType
+	OwnerShipType PermitType
 	ChangedAt     time.Time
 }
 

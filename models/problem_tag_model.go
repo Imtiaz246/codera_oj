@@ -7,7 +7,7 @@ import (
 
 type ProblemTag struct {
 	gorm.Model
-	TagID     uint
+	TagID     uint `json:"tagID"`
 	Tag       *Tag
 	ProblemID uint
 	Problem   *Problem

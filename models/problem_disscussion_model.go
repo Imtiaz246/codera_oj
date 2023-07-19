@@ -15,7 +15,7 @@ type ProblemDiscussion struct {
 	ProblemID uint
 	Problem   *Problem
 
-	OwnerShipType OwnershipType
+	OwnerShipType PermitType
 	SentAt        time.Time
 }
 

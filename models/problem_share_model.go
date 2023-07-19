@@ -5,18 +5,14 @@ import (
 	"gorm.io/gorm"
 )
 
-type OwnershipType int
+type PermitType string
 
 const (
-	Author OwnershipType = iota
-	Editor
-	Viewer
-	Tester
+	Author PermitType = "Author"
+	Editor PermitType = "Editor"
+	Viewer PermitType = "Viewer"
+	Tester PermitType = "Tester"
 )
-
-func (i OwnershipType) String() string {
-	return [...]string{"Author", "Editor", "Viewer", "Tester"}[i-1]
-}
 
 type ProblemShare struct {
 	gorm.Model
@@ -24,7 +20,7 @@ type ProblemShare struct {
 	User          *User
 	ProblemID     uint
 	Problem       *Problem
-	OwnerShipType OwnershipType `gorm:"default:0"`
+	OwnerShipType PermitType `gorm:"default:0"`
 }
 
 func init() {

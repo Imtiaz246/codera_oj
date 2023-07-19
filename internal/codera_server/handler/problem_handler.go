@@ -5,7 +5,6 @@ import (
 	apiv1 "github.com/imtiaz246/codera_oj/internal/codera_server/api/v1"
 	"github.com/imtiaz246/codera_oj/models"
 	"github.com/imtiaz246/codera_oj/utils"
-	"github.com/imtiaz246/codera_oj/vendor/github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 	"net/http"
 	"strconv"

@@ -18,8 +18,8 @@ type Problem struct {
 	gorm.Model
 	AuthorID  uint
 	Author    *User    `gorm:"required;foreignKey:AuthorID" json:"-"`
-	ContestID *uint    `json:"contest_id,omitempty"`
-	Contest   *Contest `json:"-"`
+	ContestID *uint    `json:"contestID"`
+	Contest   *Contest `json:"contest"`
 	Title     string   `gorm:"Index;not null;type:varchar(55)"`
 
 	TimeLimit                         float64

@@ -7,7 +7,7 @@ import (
 
 type Tag struct {
 	gorm.Model
-	TagName string
+	TagName string `gorm:"unique;index"`
 	UserID  uint
 	AddedBy *User `gorm:"foreignKey:UserID"`
 }

@@ -42,7 +42,7 @@ func SignUp(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 	if err := models.GetUserByUsernameOrEmail(u.Username, ve.Email, u); err == nil {
-		return ctx.Status(http.StatusNotAcceptable).JSON(utils.DuplicateEntry())
+		return ctx.Status(http.StatusNotAcceptable).JSON(utils.NewError(err))
 	}
 	if err := models.CreateRecord[*models.User](u); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))

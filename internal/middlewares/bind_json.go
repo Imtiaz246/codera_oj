@@ -1,10 +1,11 @@
-package handler
+package middlewares
 
 import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/imtiaz246/codera_oj/models"
+	"github.com/imtiaz246/codera_oj/utils"
+	"net/http"
 )
 
 var v *validator.Validate
@@ -27,9 +28,9 @@ func validate(s interface{}) error {
 	return nil
 }
 
-// BindAndValidate binds request payload and validates the
+// bindJsonAndValidate binds request json payload and validates the
 // requested payload.
-func BindAndValidate(ctx *fiber.Ctx, d any) error {
+func bindJsonAndValidate(ctx *fiber.Ctx, d any) error {
 	if err := ctx.BodyParser(d); err != nil {
 		return err
 	}
@@ -39,8 +40,13 @@ func BindAndValidate(ctx *fiber.Ctx, d any) error {
 	return nil
 }
 
-// GetUserFromCtx extracts requested user from ctx and returns it.
-// The user will be assigned to context from middleware
-func GetUserFromCtx(ctx *fiber.Ctx) *models.User {
-	return ctx.Locals("user").(*models.User)
+func BindJson(d any) fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		if err := bindJsonAndValidate(ctx, d); err != nil {
+			return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
+		}
+		ctx.Locals("data", d)
+
+		return ctx.Next()
+	}
 }

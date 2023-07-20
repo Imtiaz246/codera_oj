@@ -38,7 +38,6 @@ func New() (*fiber.App, error) {
 	app.Get("/ping", func(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusOK).JSON("pong")
 	})
-
 	routes.RegisterRoutes(app)
 
 	return app, nil

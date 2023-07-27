@@ -5,7 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
-	"github.com/imtiaz246/codera_oj/internal/codera_server/router/routes"
+	"github.com/imtiaz246/codera_oj/internal/router/routes"
 	"net/http"
 )
 
@@ -13,6 +13,7 @@ import (
 func New() (*fiber.App, error) {
 	app := fiber.New()
 	app.Use(logger.New())
+	app.Static("./public", "./public")
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization",

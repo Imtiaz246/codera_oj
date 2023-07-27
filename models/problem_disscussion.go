@@ -14,9 +14,7 @@ type ProblemDiscussion struct {
 	User      *User
 	ProblemID uint
 	Problem   *Problem
-
-	OwnerShipType PermitType
-	SentAt        time.Time
+	SentAt    time.Time
 }
 
 func init() {

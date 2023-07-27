@@ -1,4 +1,4 @@
-package handler
+package problem
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -11,6 +11,5 @@ func GetProblemSet(ctx *fiber.Ctx) error {
 
 func GetProblemUsingID(ctx *fiber.Ctx) error {
 
-	ctx.Next()
 	return nil
 }

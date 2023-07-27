@@ -24,7 +24,7 @@ type Session struct {
 	DeletedAt time.Time `gorm:"index;default:null"`
 }
 
-var SessionCache = cache.NewCache[Session]()
+var SessionCache = cache.NewMemoryCache[Session]()
 
 func init() {
 	if err := db.MigrateModelTables(Session{}); err != nil {

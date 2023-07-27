@@ -8,17 +8,16 @@ import (
 type Dataset struct {
 	gorm.Model
 	Title    string
-	Weight   int64
+	Weight   int64 `gorm:"default:100"`
 	IsSample bool
 	// todo: change to file store, because it's too expensive
 	Input  []byte
 	Output []byte
 
-	UserID        uint
-	AddedBy       *User `gorm:"foreignKey:UserID"`
-	ProblemID     uint
-	Problem       *Problem
-	OwnerShipType PermitType
+	UserID    uint
+	AddedBy   *User `gorm:"foreignKey:UserID"`
+	ProblemID uint
+	Problem   *Problem
 }
 
 func init() {

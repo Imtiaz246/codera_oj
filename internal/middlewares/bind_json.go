@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/imtiaz246/codera_oj/utils"
+	"github.com/imtiaz246/codera_oj/internal/utils"
 	"net/http"
 )
 
@@ -45,7 +45,7 @@ func BindJson(d any) fiber.Handler {
 		if err := bindJsonAndValidate(ctx, d); err != nil {
 			return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
 		}
-		ctx.Locals("data", d)
+		ctx.Locals("body", d)
 
 		return ctx.Next()
 	}

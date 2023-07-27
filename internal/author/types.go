@@ -1,4 +1,4 @@
-package v1
+package author
 
 import (
 	"github.com/imtiaz246/codera_oj/models"
@@ -37,4 +37,24 @@ func (p *UpdateProblemOption) UpdateProblemModelFormat(user *models.User, ID uin
 
 type AddTagOption struct {
 	TagName string `json:"tagName"`
+}
+
+type ShareProblemOption struct {
+	ShareWith  string            `json:"shareWith"`
+	PermitType models.PermitType `json:"permitType"`
+}
+
+type DatasetOption struct {
+	Title    string `json:"title"`
+	Weight   int64  `json:"weight"`
+	IsSample bool   `json:"isSample"`
+}
+
+type SolutionOption struct {
+	Code     string `json:"code"`
+	Language string `json:"language"`
+}
+
+type DiscussionOption struct {
+	Message string `json:"message"`
 }

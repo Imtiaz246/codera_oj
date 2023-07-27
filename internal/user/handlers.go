@@ -1,10 +1,9 @@
-package handler
+package user
 
 import (
 	"github.com/gofiber/fiber/v2"
-	apiv1 "github.com/imtiaz246/codera_oj/internal/codera_server/api/v1"
+	"github.com/imtiaz246/codera_oj/internal/utils"
 	"github.com/imtiaz246/codera_oj/models"
-	"github.com/imtiaz246/codera_oj/utils"
 	"net/http"
 )
 
@@ -24,7 +23,8 @@ func GetUserByUsername(c *fiber.Ctx) error {
 		return c.Status(http.StatusNotAcceptable).JSON(utils.NewError(err))
 	}
 
-	return c.Status(http.StatusOK).JSON(apiv1.NewUserResponse(u))
+	// todo: change u to APIFormat
+	return c.Status(http.StatusOK).JSON(u)
 }
 
 // UpdateUser updates a user's information
@@ -33,11 +33,11 @@ func GetUserByUsername(c *fiber.Ctx) error {
 // @Description Update user info
 // @Tags user
 // @Param username path string true "username"
-// @Param data body apiv1.UserUpdateRequest true "data"
+// @Param data body UserUpdateRequest true "data"
 // @Accept */*
 // @Produce json
 // @Success 200 {object} map[string]interface{}
-// @Router /users/{username} [put]
+// @Router /users [put]
 func UpdateUser(c *fiber.Ctx) error {
 
 	return nil
@@ -49,11 +49,11 @@ func UpdateUser(c *fiber.Ctx) error {
 // @Description updates user info
 // @Tags user
 // @Param username path string true "username"
-// @Param data body apiv1.UserUpdatePasswordRequest true "data"
+// @Param data body UserUpdatePasswordRequest true "data"
 // @Accept */*
 // @Produce json
 // @Success 200 {object} map[string]interface{}
-// @Router /users/{username}/password [put]
+// @Router /users/password [put]
 func UpdatePassword(c *fiber.Ctx) error {
 
 	return c.Status(http.StatusOK).JSON("")

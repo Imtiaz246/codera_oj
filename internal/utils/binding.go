@@ -1,10 +1,11 @@
-package handler
+package utils
 
 import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/imtiaz246/codera_oj/models"
+	"reflect"
 )
 
 var v *validator.Validate
@@ -43,4 +44,19 @@ func BindAndValidate(ctx *fiber.Ctx, d any) error {
 // The user will be assigned to context from middleware
 func GetUserFromCtx(ctx *fiber.Ctx) *models.User {
 	return ctx.Locals("user").(*models.User)
+}
+
+// GetFromReqBody reads data from ctx.Locals("body") which was set by the BindJson middleware earlier
+func GetFromReqBody[T any](ctx *fiber.Ctx) (T, error) {
+	var t T
+	if reflect.TypeOf(t).Kind() != reflect.Pointer {
+		return t, fmt.Errorf("type has to be a pointer while getting data from ctx")
+	}
+	body := ctx.Locals("body")
+	if reflect.TypeOf(body) != reflect.TypeOf(t) {
+		return t, fmt.Errorf("type mismatch while getting data from ctx")
+	}
+	t = body.(T)
+
+	return t, nil
 }

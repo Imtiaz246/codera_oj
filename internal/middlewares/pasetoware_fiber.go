@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/imtiaz246/codera_oj/custom/config"
+	"github.com/imtiaz246/codera_oj/internal/utils"
 	"github.com/o1egl/paseto"
+	"net/http"
 	"strings"
 	"time"
 )
@@ -48,22 +50,22 @@ func NewPasetoMiddleware(configs ...*PasetoConfig) fiber.Handler {
 		}
 		token := tokenExtractor(ctx)
 		if token == "" {
-			return fmt.Errorf("token not found")
+			return ctx.Status(http.StatusForbidden).JSON(utils.NewError(fmt.Errorf("token not found")))
 		}
 
 		pasetoPayload := new(paseto.JSONToken)
 		key, err := base64.StdEncoding.DecodeString(c.SymmetricKey)
 		if err != nil {
-			return fmt.Errorf("token decoding failed: %v", err)
+			return ctx.Status(http.StatusForbidden).JSON(utils.NewError(fmt.Errorf("invalid token type error: `%v`", err)))
 		}
 
 		err = decryptor.Decrypt(token, key, pasetoPayload, nil)
 		if err != nil {
-			return fmt.Errorf("invalid token: %v", err)
+			return ctx.Status(http.StatusForbidden).JSON(utils.NewError(fmt.Errorf("invalid token")))
 		}
 
 		if time.Now().After(pasetoPayload.Expiration) {
-			return fmt.Errorf("token has expired, expired time is: %v", pasetoPayload.Expiration)
+			return ctx.Status(http.StatusForbidden).JSON(utils.NewError(fmt.Errorf("token has expired, expired time is: %v", pasetoPayload.Expiration)))
 		}
 
 		ctx.Locals(c.ContextKey, pasetoPayload)
@@ -84,8 +86,11 @@ func createTokenExtractor(tokenLookup, authScheme string) func(ctx *fiber.Ctx) s
 		switch tokenSourceParts[0] {
 		case "header":
 			checks = append(checks, func(ctx *fiber.Ctx) string {
-				token := strings.Split(ctx.Get(tokenSourceParts[1]), authScheme)[1]
-				return token
+				ss := strings.Split(ctx.Get(tokenSourceParts[1]), authScheme)
+				if len(ss) > 1 {
+					return ss[1]
+				}
+				return ""
 			})
 		case "query":
 			checks = append(checks, func(ctx *fiber.Ctx) string {

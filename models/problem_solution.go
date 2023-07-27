@@ -15,11 +15,10 @@ type ProblemSolution struct {
 	TimeTaken    float32
 	MemoryTaken  float64
 
-	UserID        uint
-	User          *User
-	ProblemId     uint
-	Problem       *Problem
-	OwnerShipType PermitType
+	UserID    uint
+	User      *User
+	ProblemId uint
+	Problem   *Problem
 }
 
 func init() {

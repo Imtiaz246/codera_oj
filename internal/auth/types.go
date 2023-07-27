@@ -1,4 +1,4 @@
-package v1
+package auth
 
 import (
 	"github.com/imtiaz246/codera_oj/models"

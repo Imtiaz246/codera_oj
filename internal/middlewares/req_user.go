@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/imtiaz246/codera_oj/internal/utils"
 	"github.com/imtiaz246/codera_oj/models"
-	"github.com/imtiaz246/codera_oj/utils"
 	"github.com/o1egl/paseto"
 	"net/http"
 )

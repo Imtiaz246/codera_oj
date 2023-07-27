@@ -6,32 +6,32 @@ import (
 	"time"
 )
 
-// Cache is the cache instance to manage session cache
-type Cache[VT any] struct {
+// MemoryCache is the MemoryCache instance to manage session MemoryCache
+type MemoryCache[VT any] struct {
 	mu         sync.Mutex
 	data       map[string]VT
 	lastAccess time.Time
 }
 
-func NewCache[VT any]() *Cache[VT] {
-	return &Cache[VT]{
+func NewMemoryCache[VT any]() Cache[VT] {
+	return &MemoryCache[VT]{
 		data:       make(map[string]VT),
 		lastAccess: time.Now(),
 	}
 }
 
 // lock is used to synchronize the data processing from map
-func (c *Cache[VT]) lock() {
+func (c *MemoryCache[VT]) lock() {
 	c.mu.Lock()
 }
 
 // unlock is used to synchronize the data processing from map
-func (c *Cache[VT]) unlock() {
+func (c *MemoryCache[VT]) unlock() {
 	c.mu.Unlock()
 }
 
 // Get returns the user session VT with respect to a key
-func (c *Cache[VT]) Get(key string) (*VT, error) {
+func (c *MemoryCache[VT]) Get(key string) (*VT, error) {
 	c.lock()
 	defer c.unlock()
 
@@ -44,7 +44,7 @@ func (c *Cache[VT]) Get(key string) (*VT, error) {
 }
 
 // Set sets a session VT with respect to a key
-func (c *Cache[VT]) Set(key string, value VT) error {
+func (c *MemoryCache[VT]) Set(key string, value VT) error {
 	c.lock()
 	defer c.unlock()
 
@@ -57,15 +57,15 @@ func (c *Cache[VT]) Set(key string, value VT) error {
 }
 
 // Remove deletes a key from SessionCache map
-func (c *Cache[VT]) Remove(key string) {
+func (c *MemoryCache[VT]) Remove(key string) {
 	c.lock()
 	defer c.unlock()
 
 	delete(c.data, key)
 }
 
-// Flush removes all element from the cache
-func (c *Cache[VT]) Flush() {
+// Flush removes all element from the MemoryCache
+func (c *MemoryCache[VT]) Flush() {
 	c.lock()
 	defer c.unlock()
 

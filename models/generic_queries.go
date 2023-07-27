@@ -27,6 +27,10 @@ func GetAllRecords[T ST]() ([]T, error) {
 	return t, nil
 }
 
+func GetRecordByModel[T ST](t T) error {
+	return db.GetEngine().First(&t).Error
+}
+
 func GetRecordByID[T ST](ID string) (T, error) {
 	var t T
 	err := db.GetEngine().Where("id = ?", ID).First(&t).Error
@@ -34,15 +38,15 @@ func GetRecordByID[T ST](ID string) (T, error) {
 }
 
 func CreateRecord[T ST](t T) error {
-	return db.GetEngine().Create(t).Error
+	return db.GetEngine().Create(&t).Error
 }
 
 func UpdateRecord[T ST](t T) error {
-	return db.GetEngine().Save(t).Error
+	return db.GetEngine().Save(&t).Error
 }
 
 func DeleteRecord[T ST](t T) error {
-	return db.GetEngine().Delete(t).Error
+	return db.GetEngine().Delete(&t).Error
 }
 
 func DeleteRecordByID[T ST](ID uint) (T, error) {

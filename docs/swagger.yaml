@@ -1,6 +1,6 @@
 basePath: /api/v1
 definitions:
-  v1.UserLoginRequest:
+  auth.UserLoginRequest:
     properties:
       email:
         type: string
@@ -12,7 +12,7 @@ definitions:
     required:
     - password
     type: object
-  v1.UserLoginResponse:
+  auth.UserLoginResponse:
     properties:
       AccessToken:
         type: string
@@ -23,9 +23,9 @@ definitions:
       RefreshTokenExpiresAt:
         type: string
       User:
-        $ref: '#/definitions/v1.UserResponse'
+        $ref: '#/definitions/auth.UserResponse'
     type: object
-  v1.UserRegisterRequest:
+  auth.UserRegisterRequest:
     properties:
       email:
         type: string
@@ -38,28 +38,95 @@ definitions:
     - password
     - username
     type: object
-  v1.UserResponse:
+  auth.UserResponse:
     properties:
       city:
         type: string
       country:
         type: string
-      email:
+      displayName:
         type: string
-      first_name:
+      email:
         type: string
       id:
         type: integer
       image:
-        type: string
-      last_name:
         type: string
       organization:
         type: string
       username:
         type: string
     type: object
-  v1.UserUpdatePasswordRequest:
+  author.CreateProblemOption:
+    properties:
+      title:
+        type: string
+    required:
+    - title
+    type: object
+  author.DiscussionOption:
+    properties:
+      message:
+        type: string
+    type: object
+  author.ShareProblemOption:
+    properties:
+      permitType:
+        $ref: '#/definitions/models.PermitType'
+      shareWith:
+        type: string
+    type: object
+  author.SolutionOption:
+    properties:
+      code:
+        type: string
+      language:
+        type: string
+    type: object
+  author.UpdateProblemOption:
+    properties:
+      checkerType:
+        $ref: '#/definitions/models.CheckerType'
+      inputStatement:
+        type: string
+      memoryLimit:
+        type: number
+      noteStatement:
+        type: string
+      outputStatement:
+        type: string
+      statement:
+        type: string
+      statementsVisibilityDuringContest:
+        type: boolean
+      timeLimit:
+        type: number
+    type: object
+  models.CheckerType:
+    enum:
+    - Default
+    - String
+    - Float
+    - Special
+    type: string
+    x-enum-varnames:
+    - Default
+    - String
+    - Float
+    - Special
+  models.PermitType:
+    enum:
+    - Author
+    - Editor
+    - Viewer
+    - Tester
+    type: string
+    x-enum-varnames:
+    - Author
+    - Editor
+    - Viewer
+    - Tester
+  user.UserUpdatePasswordRequest:
     properties:
       new_password:
         minLength: 6
@@ -71,7 +138,7 @@ definitions:
     - new_password
     - old_password
     type: object
-  v1.UserUpdateRequest:
+  user.UserUpdateRequest:
     properties:
       city:
         type: string
@@ -99,7 +166,29 @@ info:
   title: Fiber Example API
   version: "2.0"
 paths:
-  /auth/{username}/renew-token:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: logs in a user if valid credentials given.
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/auth.UserLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.UserLoginResponse'
+      summary: Login a user.
+      tags:
+      - auth
+  /auth/renew-token:
     get:
       consumes:
       - application/json
@@ -127,28 +216,6 @@ paths:
       summary: Renew the access token
       tags:
       - auth
-  /auth/login:
-    post:
-      consumes:
-      - application/json
-      description: logs in a user if valid credentials given.
-      parameters:
-      - description: data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/v1.UserLoginRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.UserLoginResponse'
-      summary: Login a user.
-      tags:
-      - auth
   /auth/signup:
     post:
       consumes:
@@ -160,7 +227,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/v1.UserRegisterRequest'
+          $ref: '#/definitions/auth.UserRegisterRequest'
       produces:
       - application/json
       responses:
@@ -199,6 +266,198 @@ paths:
       summary: Verify email address.
       tags:
       - auth
+  /author/problems/:
+    post:
+      consumes:
+      - application/json
+      description: creates problem for the oj.
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/author.CreateProblemOption'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: creates a problem.
+      tags:
+      - author
+  /author/problems/{id}:
+    put:
+      consumes:
+      - application/json
+      description: updates problem with the new information.
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/author.UpdateProblemOption'
+      - description: problem id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: updates a problem.
+      tags:
+      - author
+  /author/problems/{id}/:
+    put:
+      consumes:
+      - application/json
+      description: shares problem so that other user can contribute to that problem.
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/author.ShareProblemOption'
+      - description: problem id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: shares a problem with other user
+      tags:
+      - author
+  /author/problems/{id}/dataset:
+    post:
+      consumes:
+      - application/json
+      description: adds datasets(input & output file) for a problem
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/author.ShareProblemOption'
+      - description: problem id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: adds dataset for a problem
+      tags:
+      - author
+  /author/problems/{id}/discussions:
+    post:
+      consumes:
+      - application/json
+      description: adds discussion messages for a problem
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/author.DiscussionOption'
+      - description: problem id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: adds discussion messages for a problem
+      tags:
+      - author
+  /author/problems/{id}/solutions:
+    post:
+      consumes:
+      - application/json
+      description: adds solutions for a problem. Only authorized people(to whom have
+        to that problem) can add solution
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/author.SolutionOption'
+      - description: problem id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: adds solution for a problem
+      tags:
+      - author
+  /users:
+    put:
+      consumes:
+      - '*/*'
+      description: Update user info
+      parameters:
+      - description: username
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/user.UserUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a user
+      tags:
+      - user
   /users/{username}:
     get:
       consumes:
@@ -221,34 +480,7 @@ paths:
       summary: Get a user using username.
       tags:
       - user
-    put:
-      consumes:
-      - '*/*'
-      description: Update user info
-      parameters:
-      - description: username
-        in: path
-        name: username
-        required: true
-        type: string
-      - description: data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/v1.UserUpdateRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Update a user
-      tags:
-      - user
-  /users/{username}/password:
+  /users/password:
     put:
       consumes:
       - '*/*'
@@ -264,7 +496,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/v1.UserUpdatePasswordRequest'
+          $ref: '#/definitions/user.UserUpdatePasswordRequest'
       produces:
       - application/json
       responses:

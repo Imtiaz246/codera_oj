@@ -1,4 +1,4 @@
-package auth
+package structs
 
 import (
 	"github.com/imtiaz246/codera_oj/models"

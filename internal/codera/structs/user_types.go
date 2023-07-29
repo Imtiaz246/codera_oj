@@ -1,4 +1,4 @@
-package user
+package structs
 
 type UserUpdateRequest struct {
 	FirstName    string `json:"first_name"`

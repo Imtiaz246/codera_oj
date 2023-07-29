@@ -3,6 +3,7 @@ package author
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/imtiaz246/codera_oj/internal/codera/structs"
 	"github.com/imtiaz246/codera_oj/internal/utils"
 	"github.com/imtiaz246/codera_oj/models"
 	"gorm.io/gorm"
@@ -21,7 +22,7 @@ import (
 // @Success 200 {object} map[string]interface{}
 // @Router /author/problems/ [post]
 func CreateProblem(ctx *fiber.Ctx) error {
-	req := new(CreateProblemOption)
+	req := new(structs.CreateProblemOption)
 	if err := utils.BindAndValidate(ctx, req); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
 	}
@@ -50,7 +51,7 @@ func CreateProblem(ctx *fiber.Ctx) error {
 // @Success 200 {object} map[string]interface{}
 // @Router /author/problems/{id} [put]
 func UpdateProblem(ctx *fiber.Ctx) error {
-	req := new(UpdateProblemOption)
+	req := new(structs.UpdateProblemOption)
 	if err := utils.BindAndValidate(ctx, req); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
 	}
@@ -84,7 +85,7 @@ func UpdateProblem(ctx *fiber.Ctx) error {
 // @Success 200 {object} map[string]interface{}
 // @Router /author/problems/{id}/ [put]
 func ShareProblem(ctx *fiber.Ctx) error {
-	req := new(ShareProblemOption)
+	req := new(structs.ShareProblemOption)
 	if err := utils.BindAndValidate(ctx, req); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
 	}
@@ -130,7 +131,7 @@ func ShareProblem(ctx *fiber.Ctx) error {
 // @Success 200 {object} map[string]interface{}
 // @Router /author/problems/{id}/dataset [post]
 func AddDataset(ctx *fiber.Ctx) error {
-	req := new(DatasetOption)
+	req := new(structs.DatasetOption)
 	if err := utils.BindAndValidate(ctx, req); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
 	}
@@ -175,7 +176,7 @@ func AddDataset(ctx *fiber.Ctx) error {
 // @Success 200 {object} map[string]interface{}
 // @Router /author/problems/{id}/solutions [post]
 func AddProblemSolution(ctx *fiber.Ctx) error {
-	req := new(SolutionOption)
+	req := new(structs.SolutionOption)
 	if err := utils.BindAndValidate(ctx, req); err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}

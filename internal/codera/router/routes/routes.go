@@ -2,11 +2,11 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/imtiaz246/codera_oj/internal/auth"
-	"github.com/imtiaz246/codera_oj/internal/author"
+	"github.com/imtiaz246/codera_oj/internal/codera/auth"
+	"github.com/imtiaz246/codera_oj/internal/codera/author"
+	"github.com/imtiaz246/codera_oj/internal/codera/problem"
+	"github.com/imtiaz246/codera_oj/internal/codera/user"
 	"github.com/imtiaz246/codera_oj/internal/middlewares"
-	"github.com/imtiaz246/codera_oj/internal/problem"
-	"github.com/imtiaz246/codera_oj/internal/user"
 )
 
 func RegisterRoutes(app *fiber.App) {

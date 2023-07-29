@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"github.com/google/uuid"
 	"github.com/imtiaz246/codera_oj/custom/config"
+	"github.com/imtiaz246/codera_oj/internal/codera/structs"
 	"github.com/imtiaz246/codera_oj/models"
 	"github.com/imtiaz246/codera_oj/modules/mailer"
 	"github.com/imtiaz246/codera_oj/modules/token"
@@ -12,7 +13,7 @@ import (
 )
 
 // extractRegistrationRequest extracts information for user registration request
-func extractRegistrationRequest(r *UserRegisterRequest) (*models.User, *models.VerifyEmail) {
+func extractRegistrationRequest(r *structs.UserRegisterRequest) (*models.User, *models.VerifyEmail) {
 	u := &models.User{
 		Username: r.Username,
 		Password: r.Password,

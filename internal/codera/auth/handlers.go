@@ -3,6 +3,7 @@ package auth
 import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
+	"github.com/imtiaz246/codera_oj/internal/codera/structs"
 	"github.com/imtiaz246/codera_oj/internal/utils"
 	"github.com/imtiaz246/codera_oj/models"
 	"github.com/imtiaz246/codera_oj/modules/token"
@@ -25,7 +26,7 @@ var (
 // @Success 200 {object} map[string]interface{}
 // @Router /auth/signup [post]
 func SignUp(ctx *fiber.Ctx) error {
-	req := new(UserRegisterRequest)
+	req := new(structs.UserRegisterRequest)
 	if err := utils.BindAndValidate(ctx, req); err != nil {
 		return ctx.Status(http.StatusBadRequest).JSON(utils.NewError(err))
 	}
@@ -50,7 +51,7 @@ func SignUp(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 
-	return ctx.Status(http.StatusCreated).JSON(UserSuccessfulRegistrationResponse)
+	return ctx.Status(http.StatusCreated).JSON(structs.UserSuccessfulRegistrationResponse)
 }
 
 // Login create access token and refresh token for a valid user
@@ -64,7 +65,7 @@ func SignUp(ctx *fiber.Ctx) error {
 // @Success 200 {object} UserLoginResponse
 // @Router /auth/login [post]
 func Login(ctx *fiber.Ctx) error {
-	req := new(UserLoginRequest)
+	req := new(structs.UserLoginRequest)
 	if err := utils.BindAndValidate(ctx, req); err != nil {
 		return ctx.Status(http.StatusNotAcceptable).JSON(utils.NewError(err))
 	}
@@ -98,7 +99,7 @@ func Login(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 
-	return ctx.Status(http.StatusOK).JSON(NewLoginResponse(u, accessTokenInfo, refreshTokenInfo))
+	return ctx.Status(http.StatusOK).JSON(structs.NewLoginResponse(u, accessTokenInfo, refreshTokenInfo))
 }
 
 // VerifyEmail verifies email of a valid user
@@ -126,7 +127,7 @@ func VerifyEmail(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 
-	return ctx.Status(http.StatusOK).JSON(EmailSuccessfulVerificationResponse)
+	return ctx.Status(http.StatusOK).JSON(structs.EmailSuccessfulVerificationResponse)
 }
 
 // RenewToken renews the access token using a valid refresh token
@@ -192,5 +193,5 @@ func RenewToken(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusInternalServerError).JSON(utils.NewError(err))
 	}
 
-	return ctx.Status(http.StatusOK).JSON(NewRenewTokenResponse(user, accessTokenInfo))
+	return ctx.Status(http.StatusOK).JSON(structs.NewRenewTokenResponse(user, accessTokenInfo))
 }

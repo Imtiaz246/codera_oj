@@ -5,7 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
-	"github.com/imtiaz246/codera_oj/internal/router/routes"
+	"github.com/imtiaz246/codera_oj/internal/codera/router/routes"
 	"net/http"
 )
 

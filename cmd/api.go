@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/imtiaz246/codera_oj/app/router"
+	"github.com/imtiaz246/codera_oj/internal/codera/router"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -31,7 +31,9 @@ func runApiServer() error {
 		return err
 	}
 
-	app.Listen(":3000")
+	if err = app.Listen(":3000"); err != nil {
+		panic(err)
+	}
 
 	return nil
 }

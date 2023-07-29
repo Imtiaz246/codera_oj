@@ -1,8 +1,13 @@
-tmp
+# Editors
 .idea
+.vscode
+
+# Temporaray & build directories
+tmp
+
+# Local directories & files
 practise.go
 gorm.sqlite
 custom/config/app.ini
 custom/config/app.yaml
 fiber.sqlite3
-.vscode

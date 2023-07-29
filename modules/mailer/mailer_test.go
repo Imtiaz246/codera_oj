@@ -1,22 +1,16 @@
 package mailer
 
 import (
-	"github.com/imtiaz246/codera_oj/initializers"
 	"github.com/imtiaz246/codera_oj/models"
 	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
 )
 
-func init() {
-	if err := initializers.Initialize(); err != nil {
-		panic("initialization failed")
-	}
-}
 func TestMailer(t *testing.T) {
 	user := models.User{
-		Username: "imtiaz_email_test",
-		Email:    "imtiazuddincho246@gmail.com",
+		Handle: "imtiaz_email_test",
+		Email:  "imtiazuddincho246@gmail.com",
 	}
 	evm := models.VerifyEmail{
 		Email:          "imtiazuddincho246@gmail.com",

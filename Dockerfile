@@ -8,7 +8,7 @@ RUN CGO_ENABLED=0 go build -o main -a
 # second stage #
 FROM alpine:latest
 WORKDIR /root/
-COPY --from=builder /app/main .
-COPY --from=builder /app/config/app.yaml .
+COPY --from=builder /internal/app/main .
+COPY --from=builder /internal/codera_server/config/app.yaml .
 EXPOSE 3000
 CMD ["./main", "-p=3000"]

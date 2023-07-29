@@ -44,7 +44,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.UserLoginRequest"
+                            "$ref": "#/definitions/auth.UserLoginRequest"
                         }
                     }
                 ],
@@ -52,7 +52,48 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.UserLoginResponse"
+                            "$ref": "#/definitions/auth.UserLoginResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/renew-token": {
+            "get": {
+                "description": "Renew the access token using the refresh token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Renew the access token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "minLength": 1,
+                        "type": "string",
+                        "description": "refresh token",
+                        "name": "refresh-token",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     }
                 }
@@ -78,7 +119,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.UserRegisterRequest"
+                            "$ref": "#/definitions/auth.UserRegisterRequest"
                         }
                     }
                 ],
@@ -133,9 +174,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/{username}/renew-token": {
-            "get": {
-                "description": "Renew the access token using the refresh token",
+        "/author/problems/": {
+            "post": {
+                "description": "creates problem for the oj.",
                 "consumes": [
                     "application/json"
                 ],
@@ -143,9 +184,254 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "author"
                 ],
-                "summary": "Renew the access token",
+                "summary": "creates a problem.",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/author.CreateProblemOption"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/author/problems/{id}": {
+            "put": {
+                "description": "updates problem with the new information.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "author"
+                ],
+                "summary": "updates a problem.",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/author.UpdateProblemOption"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "problem id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/author/problems/{id}/": {
+            "put": {
+                "description": "shares problem so that other user can contribute to that problem.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "author"
+                ],
+                "summary": "shares a problem with other user",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/author.ShareProblemOption"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "problem id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/author/problems/{id}/dataset": {
+            "post": {
+                "description": "adds datasets(input \u0026 output file) for a problem",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "author"
+                ],
+                "summary": "adds dataset for a problem",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/author.ShareProblemOption"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "problem id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/author/problems/{id}/discussions": {
+            "post": {
+                "description": "adds discussion messages for a problem",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "author"
+                ],
+                "summary": "adds discussion messages for a problem",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/author.DiscussionOption"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "problem id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/author/problems/{id}/solutions": {
+            "post": {
+                "description": "adds solutions for a problem. Only authorized people(to whom have to that problem) can add solution",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "author"
+                ],
+                "summary": "adds solution for a problem",
+                "parameters": [
+                    {
+                        "description": "data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/author.SolutionOption"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "problem id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "put": {
+                "description": "Update user info",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Update a user",
                 "parameters": [
                     {
                         "type": "string",
@@ -155,12 +441,55 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "minLength": 1,
+                        "description": "data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/users/password": {
+            "put": {
+                "description": "updates user info",
+                "consumes": [
+                    "*/*"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Update user password",
+                "parameters": [
+                    {
                         "type": "string",
-                        "description": "refresh token",
-                        "name": "refresh-token",
-                        "in": "query",
+                        "description": "username",
+                        "name": "username",
+                        "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "data",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UserUpdatePasswordRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -205,93 +534,11 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "put": {
-                "description": "Update user info",
-                "consumes": [
-                    "*/*"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Update a user",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "username",
-                        "name": "username",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "data",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.UserUpdateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
-        },
-        "/users/{username}/password": {
-            "put": {
-                "description": "updates user info",
-                "consumes": [
-                    "*/*"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Update user password",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "username",
-                        "name": "username",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "data",
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.UserUpdatePasswordRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
             }
         }
     },
     "definitions": {
-        "v1.UserLoginRequest": {
+        "auth.UserLoginRequest": {
             "type": "object",
             "required": [
                 "password"
@@ -309,7 +556,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.UserLoginResponse": {
+        "auth.UserLoginResponse": {
             "type": "object",
             "properties": {
                 "AccessToken": {
@@ -325,11 +572,11 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "User": {
-                    "$ref": "#/definitions/v1.UserResponse"
+                    "$ref": "#/definitions/auth.UserResponse"
                 }
             }
         },
-        "v1.UserRegisterRequest": {
+        "auth.UserRegisterRequest": {
             "type": "object",
             "required": [
                 "password",
@@ -348,7 +595,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.UserResponse": {
+        "auth.UserResponse": {
             "type": "object",
             "properties": {
                 "city": {
@@ -357,19 +604,16 @@ const docTemplate = `{
                 "country": {
                     "type": "string"
                 },
-                "email": {
+                "displayName": {
                     "type": "string"
                 },
-                "first_name": {
+                "email": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
                 "image": {
-                    "type": "string"
-                },
-                "last_name": {
                     "type": "string"
                 },
                 "organization": {
@@ -380,7 +624,107 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.UserUpdatePasswordRequest": {
+        "author.CreateProblemOption": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "author.DiscussionOption": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "author.ShareProblemOption": {
+            "type": "object",
+            "properties": {
+                "permitType": {
+                    "$ref": "#/definitions/models.PermitType"
+                },
+                "shareWith": {
+                    "type": "string"
+                }
+            }
+        },
+        "author.SolutionOption": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "language": {
+                    "type": "string"
+                }
+            }
+        },
+        "author.UpdateProblemOption": {
+            "type": "object",
+            "properties": {
+                "checkerType": {
+                    "$ref": "#/definitions/models.CheckerType"
+                },
+                "inputStatement": {
+                    "type": "string"
+                },
+                "memoryLimit": {
+                    "type": "number"
+                },
+                "noteStatement": {
+                    "type": "string"
+                },
+                "outputStatement": {
+                    "type": "string"
+                },
+                "statement": {
+                    "type": "string"
+                },
+                "statementsVisibilityDuringContest": {
+                    "type": "boolean"
+                },
+                "timeLimit": {
+                    "type": "number"
+                }
+            }
+        },
+        "models.CheckerType": {
+            "type": "string",
+            "enum": [
+                "Default",
+                "String",
+                "Float",
+                "Special"
+            ],
+            "x-enum-varnames": [
+                "Default",
+                "String",
+                "Float",
+                "Special"
+            ]
+        },
+        "models.PermitType": {
+            "type": "string",
+            "enum": [
+                "Author",
+                "Editor",
+                "Viewer",
+                "Tester"
+            ],
+            "x-enum-varnames": [
+                "Author",
+                "Editor",
+                "Viewer",
+                "Tester"
+            ]
+        },
+        "user.UserUpdatePasswordRequest": {
             "type": "object",
             "required": [
                 "new_password",
@@ -397,7 +741,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.UserUpdateRequest": {
+        "user.UserUpdateRequest": {
             "type": "object",
             "properties": {
                 "city": {

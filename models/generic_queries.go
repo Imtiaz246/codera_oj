@@ -29,7 +29,7 @@ func GetAllRecords[T ST]() ([]T, error) {
 }
 
 func GetRecordByModel[T ST](t T, preloads ...string) error {
-	return addPreloads(preloads).First(&t).Error
+	return getDBEngineWithPreloads(preloads).First(&t).Error
 }
 
 func GetRecordByID[T ST](ID string) (T, error) {
@@ -66,10 +66,10 @@ func GetRecordByExp[T ST](query any, args ...any) (T, error) {
 	return t, nil
 }
 
-func addPreloads(preloads []string) *gorm.DB {
-	db := db.GetEngine()
+func getDBEngineWithPreloads(preloads []string) *gorm.DB {
+	dbEngine := db.GetEngine()
 	for _, t := range preloads {
-		db = db.Preload(t)
+		dbEngine = dbEngine.Preload(t)
 	}
-	return db
+	return dbEngine
 }

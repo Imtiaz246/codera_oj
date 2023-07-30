@@ -62,4 +62,13 @@ func RegisterRoutes(app *fiber.App) {
 			//cAuthor.Post("/") // FixMe
 		}
 	}
+
+	{
+		// Judger routes
+		judger := apiv1.Group("/judger")
+		judger.Post("/register/:token", judger.RegisterJudger)
+		judger.Get("/submission", judger.GetSubmission)
+		judger.Get("/problems/:id/dataset/:did", judger.GetNextDataset)
+		judger.Post("/ack", judger.AcknowledgeActivity)
+	}
 }

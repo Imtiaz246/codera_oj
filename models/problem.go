@@ -37,7 +37,7 @@ type Problem struct {
 	IsProblemPublishable bool        `gorm:"default:false"`
 	IsProblemPublished   bool        `gorm:"default:false"`
 	CheckerType          CheckerType `gorm:"default:Default"`
-	SharedWith           []ProblemShare
+	Shares               []ProblemShare
 	ChangeLogs           []ProblemChangeLog
 	Discussions          []ProblemDiscussion
 }
@@ -49,7 +49,7 @@ func init() {
 }
 
 func (p *Problem) FindSharedUser(userID uint) *ProblemShare {
-	for _, ps := range p.SharedWith {
+	for _, ps := range p.Shares {
 		if ps.UserID == userID {
 			return &ps
 		}
@@ -58,9 +58,9 @@ func (p *Problem) FindSharedUser(userID uint) *ProblemShare {
 }
 
 func (p *Problem) GetSharedWithColumnName() string {
-	return "SharedWith"
+	return "Shares"
 }
 
 func (p *Problem) GetSharedUserColumnName() string {
-	return "SharedWith.SharedWith"
+	return "Shares.SharedWith"
 }

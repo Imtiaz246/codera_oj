@@ -65,10 +65,16 @@ func RegisterRoutes(app *fiber.App) {
 
 	{
 		// Judger routes
-		judger := apiv1.Group("/judger")
+		judger := apiv1.Group("/judgerhub")
 		judger.Post("/register/:token", judger.RegisterJudger)
 		judger.Get("/submission", judger.GetSubmission)
 		judger.Get("/problems/:id/dataset/:did", judger.GetNextDataset)
 		judger.Post("/ack", judger.AcknowledgeActivity)
+	}
+
+	{
+		// Admin routes
+		admin := apiv1.Group("/admin")
+		admin.Post("/judgerhub/identity", admin.AddJudgerIdentity)
 	}
 }

@@ -2,3 +2,9 @@
 // for internal usage. This variable will be accessible from anywhere.
 // But especially for internal usages.
 package settings
+
+import "github.com/imtiaz246/codera_oj/modules/judgerhub"
+
+var (
+	judgerHub = judgerhub.NewJudgerHub()
+)

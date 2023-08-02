@@ -11,6 +11,8 @@ type JudgerIdentity struct {
 	DisplayName string
 	Key         string `gorm:"unique,required"`
 	Registered  bool   `gorm:"default:false"`
+	Revoked     bool   `gorm:"default:false"`
+	Misjudged   int
 	NotBefore   time.Time
 	NotAfter    time.Time
 	OwnerID     uint

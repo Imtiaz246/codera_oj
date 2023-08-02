@@ -3,8 +3,10 @@
 // But especially for internal usages.
 package settings
 
-import "github.com/imtiaz246/codera_oj/modules/judgerhub"
+import (
+	"github.com/imtiaz246/codera_oj/internal/codera/judger"
+)
 
 var (
-	judgerHub = judgerhub.NewJudgerHub()
+	judgerHub = judger.NewJudgerHub()
 )

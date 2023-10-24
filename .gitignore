@@ -1,13 +1,17 @@
-# Editors
-.idea
-.vscode
+# exclude any development-specific files
+.vscode/
+.idea/
 
-# Temporaray & build directories
-tmp
+# exclude build artifacts
+bin/
+tmp/
 
-# Local directories & files
-practise.go
-gorm.sqlite
-custom/config/app.ini
-custom/config/app.yaml
-fiber.sqlite3
+# exclude any development-specific files
+*.env
+*.log
+*.out
+*.test
+
+# exclude dev related files
+*.sqlite
+/conf/app.yaml

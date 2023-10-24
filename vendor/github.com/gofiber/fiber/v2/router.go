@@ -6,6 +6,7 @@ package fiber
 
 import (
 	"fmt"
+	"html"
 	"sort"
 	"strconv"
 	"strings"
@@ -147,7 +148,7 @@ func (app *App) next(c *Ctx) (bool, error) {
 	}
 
 	// If c.Next() does not match, return 404
-	err := NewError(StatusNotFound, "Cannot "+c.method+" "+c.pathOriginal)
+	err := NewError(StatusNotFound, "Cannot "+c.method+" "+html.EscapeString(c.pathOriginal))
 	if !c.matched && app.methodExist(c) {
 		// If no match, scan stack again if other methods match the request
 		// Moved from app.handler because middleware may break the route chain
@@ -184,7 +185,7 @@ func (app *App) handler(rctx *fasthttp.RequestCtx) { //revive:disable-line:confu
 func (app *App) addPrefixToRoute(prefix string, route *Route) *Route {
 	prefixedPath := getGroupPath(prefix, route.Path)
 	prettyPath := prefixedPath
-	// Case sensitive routing, all to lowercase
+	// Case-sensitive routing, all to lowercase
 	if !app.config.CaseSensitive {
 		prettyPath = utils.ToLower(prettyPath)
 	}
@@ -225,7 +226,7 @@ func (*App) copyRoute(route *Route) *Route {
 	}
 }
 
-func (app *App) register(method, pathRaw string, group *Group, handlers ...Handler) Router {
+func (app *App) register(method, pathRaw string, group *Group, handlers ...Handler) {
 	// Uppercase HTTP methods
 	method = utils.ToUpper(method)
 	// Check if the HTTP method is valid unless it's USE
@@ -248,7 +249,7 @@ func (app *App) register(method, pathRaw string, group *Group, handlers ...Handl
 	}
 	// Create a stripped path in-case sensitive / trailing slashes
 	pathPretty := pathRaw
-	// Case sensitive routing, all to lowercase
+	// Case-sensitive routing, all to lowercase
 	if !app.config.CaseSensitive {
 		pathPretty = utils.ToLower(pathPretty)
 	}
@@ -302,11 +303,10 @@ func (app *App) register(method, pathRaw string, group *Group, handlers ...Handl
 		// Add route to stack
 		app.addRoute(method, &route, isMount)
 	}
-	return app
 }
 
-func (app *App) registerStatic(prefix, root string, config ...Static) Router {
-	// For security we want to restrict to the current work directory.
+func (app *App) registerStatic(prefix, root string, config ...Static) {
+	// For security, we want to restrict to the current work directory.
 	if root == "" {
 		root = "."
 	}
@@ -318,7 +318,7 @@ func (app *App) registerStatic(prefix, root string, config ...Static) Router {
 	if prefix[0] != '/' {
 		prefix = "/" + prefix
 	}
-	// in case sensitive routing, all to lowercase
+	// in case-sensitive routing, all to lowercase
 	if !app.config.CaseSensitive {
 		prefix = utils.ToLower(prefix)
 	}
@@ -441,7 +441,6 @@ func (app *App) registerStatic(prefix, root string, config ...Static) Router {
 	app.addRoute(MethodGet, &route)
 	// Add HEAD route
 	app.addRoute(MethodHead, &route)
-	return app
 }
 
 func (app *App) addRoute(method string, route *Route, isMounted ...bool) {

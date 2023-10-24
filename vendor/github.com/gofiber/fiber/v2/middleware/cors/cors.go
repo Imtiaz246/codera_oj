@@ -1,11 +1,11 @@
 package cors
 
 import (
-	"log"
 	"strconv"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 // Config defines the config for middleware.
@@ -54,6 +54,9 @@ type Config struct {
 
 	// MaxAge indicates how long (in seconds) the results of a preflight request
 	// can be cached.
+	// If you pass MaxAge 0, Access-Control-Max-Age header will not be added and
+	// browser will use 5 seconds by default.
+	// To disable caching completely, pass MaxAge value negative. It will set the Access-Control-Max-Age header 0.
 	//
 	// Optional. Default value 0.
 	MaxAge int
@@ -98,7 +101,7 @@ func New(config ...Config) fiber.Handler {
 
 	// Warning logs if both AllowOrigins and AllowOriginsFunc are set
 	if cfg.AllowOrigins != ConfigDefault.AllowOrigins && cfg.AllowOriginsFunc != nil {
-		log.Printf("[Warning] - [CORS] Both 'AllowOrigins' and 'AllowOriginsFunc' have been defined.\n")
+		log.Warn("[CORS] Both 'AllowOrigins' and 'AllowOriginsFunc' have been defined.")
 	}
 
 	// Convert string to slice
@@ -187,6 +190,8 @@ func New(config ...Config) fiber.Handler {
 		// Set MaxAge is set
 		if cfg.MaxAge > 0 {
 			c.Set(fiber.HeaderAccessControlMaxAge, maxAge)
+		} else if cfg.MaxAge < 0 {
+			c.Set(fiber.HeaderAccessControlMaxAge, "0")
 		}
 
 		// Send 204 No Content

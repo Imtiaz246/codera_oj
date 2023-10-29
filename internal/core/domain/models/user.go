@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/imtiaz246/codera_oj/internal/core/domain/dto"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -56,4 +57,17 @@ func (u *User) IsStaff() bool {
 
 func (u *User) IsUser() bool {
 	return u.Role == UserRole
+}
+
+func (u *User) ToAPIFormat() *dto.User {
+	return &dto.User{
+		ID:           int64(u.ID),
+		Username:     u.Username,
+		Email:        u.Email,
+		DisplayName:  u.DisplayName,
+		Organization: u.Organization,
+		Country:      u.Country,
+		City:         u.City,
+		Image:        u.Image,
+	}
 }

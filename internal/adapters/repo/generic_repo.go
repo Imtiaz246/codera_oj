@@ -3,6 +3,7 @@ package repo
 import (
 	"github.com/imtiaz246/codera_oj/internal/adapters/repo/db"
 	"github.com/imtiaz246/codera_oj/internal/core/domain/models"
+	"github.com/imtiaz246/codera_oj/internal/core/ports"
 	"gorm.io/gorm"
 )
 
@@ -10,15 +11,15 @@ type GenericRepo[T models.ModelFactory] struct {
 	*db.Database
 }
 
-func NewGenericRepo[T models.ModelFactory](db *db.Database) GenericInterface[T] {
+func NewGenericRepo[T models.ModelFactory](db *db.Database) ports.GenericInterface[T] {
 	return &GenericRepo[T]{
 		db,
 	}
 }
 
-func (g *GenericRepo[T]) GetAllRecords(t T) ([]T, error) {
+func (g *GenericRepo[T]) GetAllRecords() ([]T, error) {
 	records := make([]T, 0)
-	if err := g.DB.Find(&t).Error; err != nil {
+	if err := g.DB.Find(&records).Error; err != nil {
 		return nil, err
 	}
 	return records, nil

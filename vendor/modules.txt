@@ -1,9 +1,21 @@
 # github.com/KyleBanks/depth v1.2.1
 ## explicit
 github.com/KyleBanks/depth
+# github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da
+## explicit
+github.com/aead/chacha20/chacha
+# github.com/aead/chacha20poly1305 v0.0.0-20201124145622-1a5aba2a8b29
+## explicit
+github.com/aead/chacha20poly1305
+# github.com/aead/poly1305 v0.0.0-20180717145839-3fee0db0b635
+## explicit
+github.com/aead/poly1305
 # github.com/andybalholm/brotli v1.0.5
 ## explicit; go 1.12
 github.com/andybalholm/brotli
+# github.com/davecgh/go-spew v1.1.1
+## explicit
+github.com/davecgh/go-spew/spew
 # github.com/gabriel-vasile/mimetype v1.4.2
 ## explicit; go 1.20
 github.com/gabriel-vasile/mimetype
@@ -90,6 +102,15 @@ github.com/mattn/go-runewidth
 # github.com/mattn/go-sqlite3 v1.14.17
 ## explicit; go 1.16
 github.com/mattn/go-sqlite3
+# github.com/o1egl/paseto v1.0.0
+## explicit
+github.com/o1egl/paseto
+# github.com/pkg/errors v0.8.0
+## explicit
+github.com/pkg/errors
+# github.com/pmezard/go-difflib v1.0.0
+## explicit
+github.com/pmezard/go-difflib/difflib
 # github.com/rivo/uniseg v0.2.0
 ## explicit; go 1.12
 github.com/rivo/uniseg
@@ -103,6 +124,8 @@ github.com/spf13/cobra
 github.com/spf13/pflag
 # github.com/stretchr/testify v1.8.4
 ## explicit; go 1.20
+github.com/stretchr/testify/assert
+github.com/stretchr/testify/require
 # github.com/swaggo/files/v2 v2.0.0
 ## explicit; go 1.16
 github.com/swaggo/files/v2
@@ -124,7 +147,10 @@ github.com/valyala/tcplisten
 # golang.org/x/crypto v0.7.0
 ## explicit; go 1.17
 golang.org/x/crypto/bcrypt
+golang.org/x/crypto/blake2b
 golang.org/x/crypto/blowfish
+golang.org/x/crypto/ed25519
+golang.org/x/crypto/hkdf
 golang.org/x/crypto/sha3
 # golang.org/x/net v0.9.0
 ## explicit; go 1.17

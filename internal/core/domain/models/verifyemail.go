@@ -3,7 +3,6 @@ package models
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"errors"
 	"gorm.io/gorm"
 	"time"
 )
@@ -27,12 +26,12 @@ func (ve *VerifyEmail) SetVerificationToken() error {
 	return nil
 }
 
-func (ve *VerifyEmail) IsLinkExpired() error {
+func (ve *VerifyEmail) IsLinkExpired() bool {
 	curTime := time.Now()
 	if curTime.After(ve.ExpirationTime) {
-		return errors.New("link has been expired")
+		return true
 	}
-	return nil
+	return false
 }
 
 func (ve *VerifyEmail) IsLinkUsed() bool {

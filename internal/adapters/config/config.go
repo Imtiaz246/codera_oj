@@ -2,16 +2,16 @@ package config
 
 import (
 	"github.com/imtiaz246/codera_oj/internal/core/domain/dto"
-	"github.com/imtiaz246/codera_oj/internal/core/port"
+	"github.com/imtiaz246/codera_oj/internal/core/ports"
 )
 
 type ConfigAdapter struct {
 	// viper
 }
 
-var _ port.ConfigAdapter = (*ConfigAdapter)(nil)
+var _ ports.ConfigAdapter = (*ConfigAdapter)(nil)
 
-func NewConfigAdapter() port.ConfigAdapter {
+func NewConfigAdapter() ports.ConfigAdapter {
 	return &ConfigAdapter{}
 }
 

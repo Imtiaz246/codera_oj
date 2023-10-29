@@ -1,9 +1,11 @@
 package dto
 
-type AuthConfig struct {
-	Key                  string
-	AccessTokenDuration  string
-	RefreshTokenDuration string
+import "time"
+
+type TokenConfig struct {
+	Key                  []byte
+	AccessTokenDuration  time.Duration
+	RefreshTokenDuration time.Duration
 }
 
 type AppConfig struct {

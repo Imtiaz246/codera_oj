@@ -5,17 +5,17 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/imtiaz246/codera_oj/internal/adapters/handler/http/utils"
 	"github.com/imtiaz246/codera_oj/internal/core/domain/dto"
-	"github.com/imtiaz246/codera_oj/internal/core/port"
+	"github.com/imtiaz246/codera_oj/internal/core/ports"
 	"net/http"
 )
 
 // AuthHandler represents the HTTP handler for authentication-related requests
 type AuthHandler struct {
-	svc port.AuthService
+	svc ports.AuthService
 }
 
 // NewAuthHandler creates a new AuthHandler instance
-func NewAuthHandler(svc port.AuthService) *AuthHandler {
+func NewAuthHandler(svc ports.AuthService) *AuthHandler {
 	return &AuthHandler{
 		svc,
 	}

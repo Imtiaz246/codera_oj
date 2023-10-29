@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"github.com/google/uuid"
 	"time"
 )
 
@@ -11,17 +12,17 @@ type UserRegistration struct {
 }
 
 type UserLogin struct {
-	Username string `json:"username"`
-	Email    string `json:"email" validate:"email"`
-	Password string `json:"password" validate:"required,min=6"`
+	Username  string `json:"username"`
+	Email     string `json:"email" validate:"email"`
+	Password  string `json:"password" validate:"required,min=6"`
+	ClientIP  string `json:"clientIP" validate:"required"`
+	UserAgent string `json:"userAgent" validate:"required"`
 }
 
 type UserLoginResponse struct {
-	User                  *User     `json:"User"`
-	AccessToken           string    `json:"AccessToken"`
-	AccessTokenExpiresAt  time.Time `json:"AccessTokenExpiresAt"`
-	RefreshToken          string    `json:"RefreshToken"`
-	RefreshTokenExpiresAt time.Time `json:"RefreshTokenExpiresAt"`
+	User             *User     `json:"User"`
+	AccessTokenInfo  TokenInfo `json:"AccessTokenInfo"`
+	RefreshTokenInfo TokenInfo `json:"RefreshTokenInfo"`
 }
 
 type RequestedUser struct {
@@ -36,7 +37,7 @@ type RenewTokenResponse struct {
 }
 
 type User struct {
-	ID           uint   `json:"id"`
+	ID           int64  `json:"id"`
 	Username     string `json:"username"`
 	Email        string `json:"email"`
 	DisplayName  string `json:"displayName"`
@@ -44,4 +45,24 @@ type User struct {
 	Country      string `json:"country"`
 	City         string `json:"city"`
 	Image        string `json:"image"`
+}
+
+type EmailVerificationInfo struct {
+	UserName         string
+	VerificationLink string
+	ExpirationTime   time.Time
+}
+
+type TokenClaims struct {
+	Username  string
+	ClientIP  string
+	UserAgent string
+}
+
+type TokenInfo struct {
+	Token      string
+	ID         uuid.UUID
+	Expiration time.Time
+	IssuedAt   time.Time
+	TokenClaims
 }

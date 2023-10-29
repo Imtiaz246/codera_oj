@@ -2,7 +2,7 @@ package mailing
 
 import (
 	"fmt"
-	"github.com/imtiaz246/codera_oj/internal/core/port"
+	"github.com/imtiaz246/codera_oj/internal/core/ports"
 	"github.com/jordan-wright/email"
 	"net/smtp"
 )
@@ -23,7 +23,7 @@ type MailingAdapter struct {
 	email        email.Email
 }
 
-var _ port.MailingAdapter = (*MailingAdapter)(nil)
+var _ ports.MailingAdapter = (*MailingAdapter)(nil)
 
 func NewMailer(serviceEmail, servicePass string) *MailingAdapter {
 	return &MailingAdapter{

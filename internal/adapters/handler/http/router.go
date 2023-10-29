@@ -45,6 +45,9 @@ func NewRouter(v *validator.Validate,
 			r.Get("/renew-token", ah.RenewToken)
 			r.Get("/verify-email/:id/:token", ah.VerifyEmail)
 		})
+		v1.Route("/draft", func(r fiber.Router) {
+
+		})
 	}
 
 	return &Router{app}

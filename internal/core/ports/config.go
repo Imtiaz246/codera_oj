@@ -2,16 +2,20 @@ package ports
 
 import "github.com/imtiaz246/codera_oj/internal/core/domain/dto"
 
-// ConfigAdapter is an adapter for getting the necessary configuration
+// ConfigAdapter is an interface that provides access to various configurations required by the application.
 type ConfigAdapter interface {
-	// GetAuthConfig returns the authN and authZ related configurations
-	GetAuthConfig() *dto.AuthConfig
-	// GetAppConfig returns the application setup related configuration
+	// GetAuthConfig retrieves the authentication and authorization-related configuration.
+	GetAuthConfig() *dto.TokenConfig
+
+	// GetAppConfig retrieves the application setup configuration.
 	GetAppConfig() *dto.AppConfig
-	// GetServerConfig returns server setup related configuration
+
+	// GetServerConfig retrieves the server setup configuration.
 	GetServerConfig() *dto.ServerConfig
-	// GetMailerConfig returns the setup configuration for mailer
+
+	// GetMailerConfig retrieves the configuration for email services.
 	GetMailerConfig() *dto.EmailConfig
-	// GetDatabaseConfig returns database setup related configuration
+
+	// GetDatabaseConfig retrieves the configuration for database setup.
 	GetDatabaseConfig() *dto.DatabaseConfig
 }

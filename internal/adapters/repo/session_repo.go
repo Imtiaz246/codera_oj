@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"github.com/imtiaz246/codera_oj/internal/adapters/repo/db"
-	"github.com/imtiaz246/codera_oj/internal/core/domain/models"
+	"github.com/imtiaz246/codera_oj/internal/core/domain/models/auth"
 	"github.com/imtiaz246/codera_oj/internal/core/ports"
 	"github.com/imtiaz246/codera_oj/modules/cronera"
 	"log"
@@ -12,7 +12,7 @@ import (
 )
 
 type sessionRepo struct {
-	ports.GenericInterface[*models.Session]
+	ports.GenericInterface[*auth.Session]
 	*db.Database
 }
 
@@ -21,7 +21,7 @@ var _ ports.SessionRepoInterface = (*sessionRepo)(nil)
 func NewSessionRepo(d *db.Database) (ports.SessionRepoInterface, error) {
 	sr := &sessionRepo{
 		Database:         d,
-		GenericInterface: NewGenericRepo[*models.Session](d),
+		GenericInterface: NewGenericRepo[*auth.Session](d),
 	}
 	_, err := cronera.New().Every(1).Day().At("03:00").Do(context.Background(), sr.expiredSessionRemover)
 	if err != nil {
@@ -30,8 +30,8 @@ func NewSessionRepo(d *db.Database) (ports.SessionRepoInterface, error) {
 	return sr, nil
 }
 
-func (sr *sessionRepo) GetSessionListOfUser(userID int64) ([]models.Session, error) {
-	sessions := make([]models.Session, 0)
+func (sr *sessionRepo) GetSessionListOfUser(userID int64) ([]auth.Session, error) {
+	sessions := make([]auth.Session, 0)
 	err := sr.DB.Find(&sessions).Where("userID = ?", userID).Error
 	if err != nil {
 		return nil, err
@@ -40,8 +40,8 @@ func (sr *sessionRepo) GetSessionListOfUser(userID int64) ([]models.Session, err
 	return sessions, nil
 }
 
-func (sr *sessionRepo) GetSessionByTokenUUID(id uuid.UUID) (*models.Session, error) {
-	session := new(models.Session)
+func (sr *sessionRepo) GetSessionByTokenUUID(id uuid.UUID) (*auth.Session, error) {
+	session := new(auth.Session)
 	err := sr.DB.First(&session).Where("id = ?", id).Error
 	if err != nil {
 		return nil, err

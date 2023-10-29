@@ -1,4 +1,4 @@
-package models
+package auth
 
 import (
 	"github.com/imtiaz246/codera_oj/internal/core/domain/dto"

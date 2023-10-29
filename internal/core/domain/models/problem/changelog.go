@@ -1,7 +1,7 @@
 package problem
 
 import (
-	"github.com/imtiaz246/codera_oj/internal/core/domain/models"
+	"github.com/imtiaz246/codera_oj/internal/core/domain/models/auth"
 	"gorm.io/gorm"
 	"time"
 )
@@ -11,7 +11,7 @@ type ChangeLog struct {
 	LogMessage string
 
 	UserID    uint
-	User      *models.User
+	User      *auth.User
 	ProblemID uint
 	Problem   *Problem
 

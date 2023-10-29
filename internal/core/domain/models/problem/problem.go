@@ -1,7 +1,8 @@
 package problem
 
 import (
-	"github.com/imtiaz246/codera_oj/internal/core/domain/models"
+	"github.com/imtiaz246/codera_oj/internal/core/domain/models/auth"
+	"github.com/imtiaz246/codera_oj/internal/core/domain/models/contest"
 	"gorm.io/gorm"
 )
 
@@ -17,9 +18,9 @@ type CheckerType string
 type Problem struct {
 	gorm.Model
 	AuthorID  uint
-	Author    *models.User    `gorm:"required;foreignKey:AuthorID" json:"-"`
-	ContestID *uint           `json:"contestID"`
-	Contest   *models.Contest `json:"contest"`
+	Author    *auth.User       `gorm:"required;foreignKey:AuthorID" json:"-"`
+	ContestID *uint            `json:"contestID"`
+	Contest   *contest.Contest `json:"contest"`
 	// todo: add unique with is problem published
 	Title string `gorm:"Index;not null;type:varchar(55)"`
 

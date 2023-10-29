@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"github.com/imtiaz246/codera_oj/internal/adapters/mailing"
 	"github.com/imtiaz246/codera_oj/internal/core/domain/dto"
-	"github.com/imtiaz246/codera_oj/internal/core/domain/models"
+	"github.com/imtiaz246/codera_oj/internal/core/domain/models/auth"
 	"github.com/imtiaz246/codera_oj/internal/core/ports"
 )
 
-type AuthService struct {
+type authService struct {
 	userRepo        ports.UserRepoInterface
 	verifyEmailRepo ports.VerifyEmailRepoInterface
 	mailingAdptr    ports.MailingAdapter
@@ -18,14 +18,14 @@ type AuthService struct {
 	sessionRepo     ports.SessionRepoInterface
 }
 
-var _ ports.AuthService = (*AuthService)(nil)
+var _ ports.AuthService = (*authService)(nil)
 
 func NewAuthService(ur ports.UserRepoInterface,
 	vr ports.VerifyEmailRepoInterface,
 	ma *mailing.MailingAdapter,
 	ta ports.TokenAdapter,
 	sr ports.SessionRepoInterface) ports.AuthService {
-	return &AuthService{
+	return &authService{
 		userRepo:        ur,
 		verifyEmailRepo: vr,
 		mailingAdptr:    ma,
@@ -34,8 +34,8 @@ func NewAuthService(ur ports.UserRepoInterface,
 	}
 }
 
-func (as *AuthService) SignUp(ctx context.Context, data *dto.UserRegistration) error {
-	u := &models.User{
+func (as *authService) SignUp(ctx context.Context, data *dto.UserRegistration) error {
+	u := &auth.User{
 		Username: data.Username,
 		Password: data.Password,
 	}
@@ -50,7 +50,7 @@ func (as *AuthService) SignUp(ctx context.Context, data *dto.UserRegistration) e
 		return err
 	}
 
-	ve := &models.VerifyEmail{
+	ve := &auth.VerifyEmail{
 		Email: data.Email,
 		User:  *user,
 	}
@@ -69,7 +69,7 @@ func (as *AuthService) SignUp(ctx context.Context, data *dto.UserRegistration) e
 	return nil
 }
 
-func (as *AuthService) Login(ctx context.Context, data dto.UserLogin) (*dto.UserLoginResponse, error) {
+func (as *authService) Login(ctx context.Context, data dto.UserLogin) (*dto.UserLoginResponse, error) {
 	user, err := as.userRepo.GetUserByUsernameOrEmail(data.Username, data.Email)
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (as *AuthService) Login(ctx context.Context, data dto.UserLogin) (*dto.User
 	if err != nil {
 		return nil, err
 	}
-	session := &models.Session{
+	session := &auth.Session{
 		ID:        refreshTokenInfo.ID,
 		UserID:    user.ID,
 		UserAgent: refreshTokenInfo.UserAgent,
@@ -112,7 +112,7 @@ func (as *AuthService) Login(ctx context.Context, data dto.UserLogin) (*dto.User
 	}, nil
 }
 
-func (as *AuthService) VerifyEmail(ctx context.Context, id int64, token string) error {
+func (as *authService) VerifyEmail(ctx context.Context, id int64, token string) error {
 	ve, err := as.verifyEmailRepo.GetVerifyEmailRecordUsingIdToken(id, token)
 	if err != nil {
 		return fmt.Errorf("verify email record not found: `%v`", err)
@@ -131,7 +131,7 @@ func (as *AuthService) VerifyEmail(ctx context.Context, id int64, token string) 
 	return nil
 }
 
-func (as *AuthService) RenewToken(ctx context.Context, refToken, reqIP, reqUserAgent string) (*dto.TokenInfo, error) {
+func (as *authService) RenewToken(ctx context.Context, refToken, reqIP, reqUserAgent string) (*dto.TokenInfo, error) {
 	tokenInfo, err := as.tokenAdptr.VerifyToken(refToken)
 	if err != nil {
 		return nil, err

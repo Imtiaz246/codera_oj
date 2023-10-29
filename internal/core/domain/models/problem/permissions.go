@@ -8,3 +8,7 @@ const (
 )
 
 type PermitType string
+
+func (t PermitType) IsPermitTypeValid() bool {
+	return t == Editor || t == Viewer || t == Tester
+}

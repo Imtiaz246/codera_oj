@@ -2,8 +2,8 @@ package ports
 
 import "github.com/imtiaz246/codera_oj/internal/core/domain/dto"
 
-// MailingAdapter is an adapter to do the mailing-related work
+// MailingAdapter is an interface that provides methods for mailing-related operations.
 type MailingAdapter interface {
-	// SendEmailVerificationMail sends email for email verification
+	// SendEmailVerificationMail sends an email for the purpose of email verification.
 	SendEmailVerificationMail(receiverEmail string, data dto.EmailVerificationInfo) error
 }

@@ -1,7 +1,7 @@
 package problem
 
 import (
-	"github.com/imtiaz246/codera_oj/internal/core/domain/models"
+	"github.com/imtiaz246/codera_oj/internal/core/domain/models/auth"
 	"gorm.io/gorm"
 	"time"
 )
@@ -16,7 +16,7 @@ type Solution struct {
 	MemoryTaken  *float64
 
 	UserID    uint
-	User      *models.User
+	User      *auth.User
 	ProblemId uint
 	Problem   *Problem
 }

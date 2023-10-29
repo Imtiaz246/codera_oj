@@ -1,11 +1,12 @@
 package http
 
 import (
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
+	"github.com/imtiaz246/codera_oj/internal/adapters/handler/http/middlewares"
+	"github.com/imtiaz246/codera_oj/internal/core/domain/dto"
 	"net/http"
 )
 
@@ -13,7 +14,7 @@ type Router struct {
 	*fiber.App
 }
 
-func NewRouter(v *validator.Validate,
+func NewRouter(tc *dto.TokenConfig,
 	ah *AuthHandler) *Router {
 	app := fiber.New()
 	app.Use(logger.New())
@@ -46,7 +47,18 @@ func NewRouter(v *validator.Validate,
 			r.Get("/verify-email/:id/:token", ah.VerifyEmail)
 		})
 		v1.Route("/draft", func(r fiber.Router) {
-
+			r.Use(middlewares.NewPasetoMiddleware(tc))
+			r.Route("/problem", func(r fiber.Router) {
+				r.Post("/", CreateProblem)
+				r.Put("/:id", UpdateProblem)
+				r.Post("/:id/dataset", AddDataset)
+				r.Post("/:id/share", ShareProblem)
+				r.Post("/:id/tag", AddProblemTag)
+				r.Post("/:id/solutions", AddProblemSolution)
+				r.Put("/:id/solutions/:sid", UpdateProblemSolution)
+				r.Post("/:id/discussions", AddDiscussionMessage)
+				r.Delete("/:id/solutions/:sid", DeleteProblemSolution)
+			})
 		})
 	}
 

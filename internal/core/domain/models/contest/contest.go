@@ -1,4 +1,4 @@
-package models
+package contest
 
 import "gorm.io/gorm"
 

@@ -5,14 +5,17 @@ import (
 	"time"
 )
 
-// TokenAdapter is an interface for interacting with token-related logic
+// TokenAdapter is an interface for managing tokens.
 type TokenAdapter interface {
-	// CreateAccessToken creates a short-lived access token for a user
+	// CreateAccessToken generates a short-lived user access token based on provided token claims.
 	CreateAccessToken(claimsInfo *dto.TokenClaims) (*dto.TokenInfo, error)
-	// CreateRefreshToken creates a long-lived access token for a user
+
+	// CreateRefreshToken creates a long-lived user refresh token based on provided token claims.
 	CreateRefreshToken(claimsInfo *dto.TokenClaims) (*dto.TokenInfo, error)
-	// CreateToken creates a token with claims for a specific duration
+
+	// CreateToken generates a token with specific details and duration based on token claims.
 	CreateToken(claimsInfo *dto.TokenClaims, duration time.Duration) (*dto.TokenInfo, error)
-	// VerifyToken verifies the token and returns the payload
+
+	// VerifyToken validates and decodes a token, returns its associated information.
 	VerifyToken(token string) (*dto.TokenInfo, error)
 }

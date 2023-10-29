@@ -1,11 +1,14 @@
 package models
 
-import "github.com/imtiaz246/codera_oj/internal/core/domain/models/problem"
+import (
+	"github.com/imtiaz246/codera_oj/internal/core/domain/models/auth"
+	"github.com/imtiaz246/codera_oj/internal/core/domain/models/problem"
+)
 
 type ModelFactory interface {
-	*User |
-		*VerifyEmail |
-		*Session |
+	*auth.User |
+		*auth.VerifyEmail |
+		*auth.Session |
 		*problem.Problem |
 		*problem.ProblemTag |
 		*problem.Discussion |
